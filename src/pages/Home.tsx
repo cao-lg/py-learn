@@ -32,7 +32,6 @@ export function HomePage() {
       setUserName(storedUserName);
       setTempName(storedUserName);
     }
-    evaluatorRouter.init();
   }, []);
 
   const verifyPassword = async (username: string, password: string): Promise<boolean> => {

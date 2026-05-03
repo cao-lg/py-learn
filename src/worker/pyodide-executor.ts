@@ -31,7 +31,7 @@ async function initPyodide(): Promise<void> {
   const instance = await (pyodideModule as { loadPyodide: (config: { indexURL: string }) => Promise<PyodideInstance> }).loadPyodide({ indexURL: PYODIDE_CDN });
   pyodide = instance;
   
-  await instance.loadPackage(['micropip']);
+  // 只在需要时加载包，不预加载
 }
 
 function generateMockInputTemplate(mockInputs: string[]): string {

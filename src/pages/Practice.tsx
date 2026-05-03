@@ -59,6 +59,10 @@ export function PracticePage() {
         setIsAuthenticated(true);
         setInputPassword('');
         setPasswordError('');
+        // 开始异步初始化 Pyodide，不阻塞页面渲染
+        evaluatorRouter.init().catch(err => {
+          console.warn('Pyodide init failed, will try later:', err);
+        });
       } else {
         setPasswordError('密码错误，请重试');
       }
@@ -175,11 +179,25 @@ export function PracticePage() {
     });
   };
 
-  const handleRun = () => {
+  const handleRun = async () => {
     if (!currentQuestion) return;
     setIsRunning(true);
     setResult(null);
     setLogs('');
+
+    // 确保 Pyodide 已初始化
+    try {
+      await evaluatorRouter.init();
+    } catch (err) {
+      console.error('Failed to init Pyodide:', err);
+      setIsRunning(false);
+      setResult({
+        passed: false,
+        score: 0,
+        message: '初始化 Python 环境失败，请刷新页面重试',
+      });
+      return;
+    }
 
     evaluatorRouter.evaluate(currentQuestion, code, (evalResult) => {
       setResult(evalResult);
