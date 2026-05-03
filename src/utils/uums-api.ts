@@ -1,4 +1,4 @@
-export const API_BASE = 'https://api.gkss.cc.cd/api';
+export const API_BASE = 'https://photographs-classes-spirit-cleveland.trycloudflare.com/api';
 export const SITE_DB_NAME = 'site_1777469231464';
 
 export interface UUMSUser {
