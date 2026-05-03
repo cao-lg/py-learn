@@ -1,4 +1,4 @@
-export const API_BASE = 'http://121.40.241.83/api';
+export const API_BASE = 'https://121.40.241.83/api';
 export const SITE_DB_NAME = 'site_1777469231464';
 
 export interface UUMSUser {
