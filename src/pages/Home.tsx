@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { evaluatorRouter } from '../evaluator/router';
 import { uumsClient, getStoredUserId, getStoredUsername, setStoredUserId, setStoredUsername, clearStoredUser } from '../utils/uums-api';
 
 export function HomePage() {
