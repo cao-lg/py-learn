@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { AdminLayout } from '../components/AdminLayout';
+import { API_BASE } from '../utils/uums-api';
 
-interface StatsResponse {
-  ok: boolean;
+interface StatsData {
   totalUsers?: number;
   totalPracticeRecords?: number;
   totalExamRecords?: number;
@@ -38,7 +38,21 @@ interface StatsResponse {
     passRate?: number;
     examStats?: { examId: string; attempts: number; avgScore: number; passRate: number }[];
   };
-  error?: string;
+}
+
+interface StatsResponse {
+  code: number;
+  message: string;
+  data: StatsData;
+  timestamp: number;
+}
+
+function getAuthHeaders(): Record<string, string> {
+  const token = localStorage.getItem('adminToken');
+  if (token) {
+    return { 'Authorization': `Bearer ${token}` };
+  }
+  return {} as Record<string, string>;
 }
 
 const examTitles: Record<string, string> = {
@@ -57,7 +71,7 @@ const examTitles: Record<string, string> = {
 };
 
 export function AdminPage() {
-  const [stats, setStats] = useState<StatsResponse | null>(null);
+  const [stats, setStats] = useState<StatsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedExam, setSelectedExam] = useState<string>('all');
@@ -69,12 +83,12 @@ export function AdminPage() {
   const fetchStats = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/stats');
-      const data = await response.json();
-      if (data.ok) {
-        setStats(data);
+      const response = await fetch(`${API_BASE}/stats`);
+      const result: StatsResponse = await response.json();
+      if (result.code === 200) {
+        setStats(result.data);
       } else {
-        setError(data.error || 'Failed to fetch stats');
+        setError(result.message || 'Failed to fetch stats');
       }
     } catch (err) {
       setError('Failed to connect to API');
@@ -96,7 +110,7 @@ export function AdminPage() {
       s.examId,
       examTitles[s.examId] || s.examId,
       s.attempts.toString(),
-      s.avgScore.toFixed(1) + '%',
+      (typeof s.avgScore === 'number' ? s.avgScore.toFixed(1) : 0) + '%',
     ]);
 
     const csv = [headers, ...rows].map((row) => row.join(',')).join('\n');
@@ -110,21 +124,18 @@ export function AdminPage() {
   };
 
   const cleanupData = async (type: 'invalid' | 'all') => {
-    const password = prompt(type === 'all' ? '请输入管理员密码以清理全部记录' : '请输入管理员密码以清理无效记录');
-    if (!password) return;
-
     try {
-      const response = await fetch('/api/cleanup', {
+      const response = await fetch(`${API_BASE}/cleanup`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type, password })
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+        body: JSON.stringify({ type })
       });
-      const data = await response.json();
-      if (data.ok) {
-        alert(`${data.message}\n删除了 ${data.deletedRecords?.practiceRecords || 0} 条练习记录\n删除了 ${data.deletedRecords?.examRecords || 0} 条考试记录\n删除了 ${data.deletedRecords?.auditLogs || 0} 条审计日志`);
+      const result: any = await response.json();
+      if (result.code === 200) {
+        alert(`${result.message}\n删除了 ${result.data?.deletedRecords?.practiceRecords || 0} 条练习记录\n删除了 ${result.data?.deletedRecords?.examRecords || 0} 条考试记录\n删除了 ${result.data?.deletedRecords?.auditLogs || 0} 条审计日志`);
         fetchStats(); // 重新获取统计数据
       } else {
-        alert('数据清理失败：' + data.error);
+        alert('数据清理失败：' + result.message);
       }
     } catch (error) {
       alert('数据清理失败：网络错误');
@@ -132,27 +143,24 @@ export function AdminPage() {
   };
 
   const exportData = async () => {
-    const password = prompt('请输入管理员密码以导出学生数据');
-    if (!password) return;
-
     try {
-      const response = await fetch('/api/export', {
-        headers: { 'X-Admin-Password': `__admin__${password}` }
+      const response = await fetch(`${API_BASE}/export`, {
+        headers: getAuthHeaders()
       });
-      const data = await response.json();
-      if (data.ok) {
+      const result: any = await response.json();
+      if (result.code === 200) {
         // 生成 CSV 内容
         let csvContent = '数据类型,学生姓名,学生ID,考试/章节,分数,总题数,完成时间\n';
 
         // 添加考试记录
-        data.data?.students.forEach((student: any) => {
-          student.examRecords.forEach((record: any) => {
-            csvContent += `考试,${student.name},${student.id},${record.exam_title},${record.score},${record.total_questions},${new Date(record.completed_at).toLocaleString()}\n`;
+        result.data?.students?.forEach((student: any) => {
+          student.examRecords?.forEach((record: any) => {
+            csvContent += `考试,${student.name},${student.id},${record.exam_title},${record.score},${record.total_score},${new Date(record.completed_at).toLocaleString()}\n`;
           });
 
           // 添加练习记录
-          student.practiceRecords.forEach((record: any) => {
-            csvContent += `练习,${student.name},${student.id},${record.chapter_id},${record.score},${record.total_questions},${new Date(record.completed_at).toLocaleString()}\n`;
+          student.practiceRecords?.forEach((record: any) => {
+            csvContent += `练习,${student.name},${student.id},${record.chapter_id},${record.score},${record.total_score},${new Date(record.completed_at).toLocaleString()}\n`;
           });
         });
 
@@ -161,11 +169,11 @@ export function AdminPage() {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `学生答题记录_${new Date().toISOString().slice(0, 10)}.csv`;
+        a.download = `学生答题记录_${new Date().toISOString().slice(0,10)}.csv`;
         a.click();
         URL.revokeObjectURL(url);
       } else {
-        alert('数据导出失败：' + data.error);
+        alert('数据导出失败：' + result.message);
       }
     } catch (error) {
       alert('数据导出失败：网络错误');
@@ -289,7 +297,7 @@ export function AdminPage() {
               <div>
                 <h3 className="text-sm text-gray-500 dark:text-gray-400 mb-1">人均练习</h3>
                 <p className="text-3xl font-bold text-green-600">
-                  {stats.studentStats.avgPracticePerStudent?.toFixed(1) || 0}
+                  {typeof stats.studentStats.avgPracticePerStudent === 'number' ? stats.studentStats.avgPracticePerStudent.toFixed(1) : 0}
                 </p>
               </div>
               <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
@@ -303,7 +311,7 @@ export function AdminPage() {
               <div>
                 <h3 className="text-sm text-gray-500 dark:text-gray-400 mb-1">人均考试</h3>
                 <p className="text-3xl font-bold text-purple-600">
-                  {stats.studentStats.avgExamPerStudent?.toFixed(1) || 0}
+                  {typeof stats.studentStats.avgExamPerStudent === 'number' ? stats.studentStats.avgExamPerStudent.toFixed(1) : 0}
                 </p>
               </div>
               <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center">
@@ -349,13 +357,13 @@ export function AdminPage() {
             <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4">
               <h4 className="text-sm text-gray-500 dark:text-gray-400 mb-1">平均尝试次数</h4>
               <p className="text-xl font-bold text-gray-900 dark:text-white">
-                {stats.courseStats.avgAttemptsPerChapter?.toFixed(1) || 0}
+                {typeof stats.courseStats.avgAttemptsPerChapter === 'number' ? stats.courseStats.avgAttemptsPerChapter.toFixed(1) : 0}
               </p>
             </div>
             <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4">
               <h4 className="text-sm text-gray-500 dark:text-gray-400 mb-1">平均得分</h4>
               <p className="text-xl font-bold text-gray-900 dark:text-white">
-                {stats.courseStats.avgScorePerChapter?.toFixed(1)}%
+                {typeof stats.courseStats.avgScorePerChapter === 'number' ? stats.courseStats.avgScorePerChapter.toFixed(1) : 0}%
               </p>
             </div>
           </div>
@@ -408,13 +416,13 @@ export function AdminPage() {
             <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4">
               <h4 className="text-sm text-gray-500 dark:text-gray-400 mb-1">平均尝试次数</h4>
               <p className="text-xl font-bold text-gray-900 dark:text-white">
-                {stats.practiceStats.avgAttemptsPerQuestion?.toFixed(1) || 0}
+                {typeof stats.practiceStats.avgAttemptsPerQuestion === 'number' ? stats.practiceStats.avgAttemptsPerQuestion.toFixed(1) : 0}
               </p>
             </div>
             <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4">
               <h4 className="text-sm text-gray-500 dark:text-gray-400 mb-1">平均得分</h4>
               <p className="text-xl font-bold text-gray-900 dark:text-white">
-                {stats.practiceStats.avgScorePerQuestion?.toFixed(1)}%
+                {typeof stats.practiceStats.avgScorePerQuestion === 'number' ? stats.practiceStats.avgScorePerQuestion.toFixed(1) : 0}%
               </p>
             </div>
           </div>
@@ -456,13 +464,13 @@ export function AdminPage() {
             <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4">
               <h4 className="text-sm text-gray-500 dark:text-gray-400 mb-1">平均尝试次数</h4>
               <p className="text-xl font-bold text-gray-900 dark:text-white">
-                {stats.examDetailedStats.avgAttemptsPerExam?.toFixed(1) || 0}
+                {typeof stats.examDetailedStats.avgAttemptsPerExam === 'number' ? stats.examDetailedStats.avgAttemptsPerExam.toFixed(1) : 0}
               </p>
             </div>
             <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4">
               <h4 className="text-sm text-gray-500 dark:text-gray-400 mb-1">平均得分</h4>
               <p className="text-xl font-bold text-gray-900 dark:text-white">
-                {stats.examDetailedStats.avgScorePerExam?.toFixed(1)}%
+                {typeof stats.examDetailedStats.avgScorePerExam === 'number' ? stats.examDetailedStats.avgScorePerExam.toFixed(1) : 0}%
               </p>
             </div>
             <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4">
@@ -603,7 +611,7 @@ export function AdminPage() {
                       stat.avgScore >= 50 ? 'bg-yellow-100 text-yellow-800' : 
                       'bg-red-100 text-red-800'
                     }`}>
-                      {stat.avgScore.toFixed(1)}%
+                      {typeof stat.avgScore === 'number' ? stat.avgScore.toFixed(1) : 0}%
                     </span>
                   </td>
                 </tr>

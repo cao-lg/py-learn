@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { evaluatorRouter } from '../evaluator/router';
+import { uumsClient, getStoredUserId, getStoredUsername, setStoredUserId, setStoredUsername, clearStoredUser } from '../utils/uums-api';
 
 export function HomePage() {
   const [userName, setUserName] = useState('');
@@ -14,171 +15,76 @@ export function HomePage() {
   const [targetPage, setTargetPage] = useState('/practice');
   const navigate = useNavigate();
 
-  const checkUserExists = async (userId: string) => {
-    try {
-      const response = await fetch('/api/users-management', {
-        headers: { 'X-Admin-Password': '__admin__admin123' }
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        if (data.ok) {
-          return data.users.some((user: { id: string }) => user.id === userId);
-        }
-      }
-      return false;
-    } catch (error) {
-      console.error('Check user exists error:', error);
-      return true; // 出错时默认认为用户存在，避免误删数据
-    }
-  };
-
   useEffect(() => {
-    // 从本地存储获取用户信息（仅用于显示，实际验证需要后台）
-    const storedUserId = localStorage.getItem('userId');
-    const storedUserName = localStorage.getItem('userName');
-    
+    // Auto set UUMS credentials if not present
+    const currentAppId = localStorage.getItem('uums_app_id');
+    const currentAppSecret = localStorage.getItem('uums_app_secret');
+    if (!currentAppId || !currentAppSecret) {
+      localStorage.setItem('uums_app_id', 'app_zsdcqS4iIXiUiLIj');
+      localStorage.setItem('uums_app_secret', 'secret_LKbKFcZ4JXeFhhYkDKWlW3nKSCFDv3Ke');
+    }
+
+    const storedUserId = getStoredUserId();
+    const storedUserName = getStoredUsername();
+
     if (storedUserId && storedUserName) {
-      // 检查用户是否在后台存在
-      checkUserExists(storedUserId).then(exists => {
-        if (!exists) {
-          // 用户不存在，清理本地数据
-          localStorage.removeItem('userId');
-          localStorage.removeItem('userName');
-          setUserId('');
-          setUserName('');
-          setTempName('');
-        } else {
-          setUserId(storedUserId);
-          setUserName(storedUserName);
-          setTempName(storedUserName);
-        }
-      });
+      setUserId(storedUserId);
+      setUserName(storedUserName);
+      setTempName(storedUserName);
     }
     evaluatorRouter.init();
   }, []);
 
-
-
-  const registerUser = async (name: string, password: string) => {
-    try {
-      // 开发环境使用模拟数据
-      if (import.meta.env.DEV) {
-        console.log('Development mode: using mock data for user registration');
-        // 模拟注册成功
-        return {
-          ok: true,
-          id: 'mock-' + Date.now(),
-          name
-        };
-      }
-
-      // 生产环境使用真实 API
-      const response = await fetch('/api/users', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, password })
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to register user');
-      }
-      
-      const data = await response.json();
-      if (!data.ok) {
-        throw new Error('Failed to register user');
-      }
-      
-      return data;
-    } catch (error) {
-      console.error('Registration error:', error);
-      throw error;
+  const verifyPassword = async (username: string, password: string): Promise<boolean> => {
+    const result = await uumsClient.verifyUser(username, password);
+    if (result && result.code === 200 && result.data.valid) {
+      return true;
     }
-  };
-
-  const verifyPassword = async (userId: string, password: string) => {
-    try {
-      // 开发环境使用模拟数据
-      if (import.meta.env.DEV) {
-        console.log('Development mode: using mock data for password verification');
-        // 模拟验证成功
-        return true;
-      }
-
-      // 生产环境使用真实 API
-      const response = await fetch('/api/users/verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, password })
-      });
-      
-      if (!response.ok) {
-        // 检查是否是用户不存在的错误
-        if (response.status === 404) {
-          // 用户不存在，清理本地数据
-          localStorage.removeItem('userId');
-          localStorage.removeItem('userName');
-          setUserId('');
-          setUserName('');
-          setTempName('');
-          return false;
-        }
-        // 其他错误，如密码错误，不清理用户数据
-        return false;
-      }
-      
-      const data = await response.json();
-      return data.ok;
-    } catch (error) {
-      console.error('Password verification error:', error);
-      // 网络错误，不清理用户数据
-      return false;
-    }
+    return false;
   };
 
   const handleSave = async () => {
     if (tempName.trim() && tempPassword.trim()) {
-      try {
-        // 调用后台API注册用户
-        const userData = await registerUser(tempName.trim(), tempPassword);
-        // 仅在本地存储用户ID和用户名（用于显示）
-        localStorage.setItem('userId', userData.id);
-        localStorage.setItem('userName', userData.name);
-        setUserId(userData.id);
-        setUserName(userData.name);
-        setIsEditing(false);
-        setIsPasswordRequired(false);
-        setTempPassword('');
-        
-        // 如果之前是因为点击考试或练习按钮而触发的身份设置，导航到目标页面
-        if (targetPage) {
-          navigate(targetPage);
+      const isVerified = await verifyPassword(tempName.trim(), tempPassword);
+      if (isVerified) {
+        const result = await uumsClient.verifyUser(tempName.trim(), tempPassword);
+        if (result && result.data.user_id) {
+          setStoredUserId(String(result.data.user_id));
+          setStoredUsername(tempName.trim());
+          setUserId(String(result.data.user_id));
+          setUserName(tempName.trim());
+          setIsEditing(false);
+          setIsPasswordRequired(false);
+          setTempPassword('');
+
+          if (targetPage) {
+            navigate(targetPage);
+          }
         }
-      } catch (error) {
-        console.error('Save error:', error);
-        setPasswordError('注册失败，请重试');
+      } else {
+        setPasswordError('用户名或密码错误');
       }
     }
   };
 
   const handlePasswordVerify = async () => {
     if (userId && inputPassword) {
-      const isVerified = await verifyPassword(userId, inputPassword);
-      if (isVerified) {
-        setIsPasswordRequired(false);
-        setInputPassword('');
-        setPasswordError('');
-        // 添加authenticated=true参数，避免在ExamListPage中再次验证密码
-        navigate(`${targetPage}?authenticated=true`);
-      } else {
-        setPasswordError('密码错误，请重试');
+      const storedUsername = getStoredUsername();
+      if (storedUsername) {
+        const isVerified = await verifyPassword(storedUsername, inputPassword);
+        if (isVerified) {
+          setIsPasswordRequired(false);
+          setInputPassword('');
+          setPasswordError('');
+          navigate(`${targetPage}?authenticated=true`);
+        } else {
+          setPasswordError('密码错误，请重试');
+        }
       }
     } else {
       setPasswordError('请输入密码');
     }
   };
-
-
 
   return (
     <div className="text-center py-12">
@@ -196,10 +102,16 @@ export function HomePage() {
               当前身份：{userName}
             </span>
             <button
-              onClick={() => setIsEditing(true)}
+              onClick={() => {
+                clearStoredUser();
+                setUserId('');
+                setUserName('');
+                setTempName('');
+                setTempPassword('');
+              }}
               className="text-sm text-purple-500 hover:text-purple-600 dark:hover:text-purple-300"
             >
-              修改
+              退出
             </button>
           </div>
         ) : (
@@ -208,7 +120,7 @@ export function HomePage() {
             className="inline-flex items-center gap-2 bg-purple-100 dark:bg-purple-900/30 px-5 py-2.5 rounded-full text-purple-600 dark:text-purple-400 hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors"
           >
             <span>👤</span>
-            <span>请先设置身份</span>
+            <span>请先登录</span>
           </button>
         )}
       </div>
@@ -217,43 +129,71 @@ export function HomePage() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4 shadow-2xl">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-              {userId ? '修改身份' : '设置身份'}
+              用户登录
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-              {userId ? '修改您的身份信息' : '设置您的姓名和密码，用于保护您的学习记录'}
+              请输入您在统一用户管理系统中的账号信息
             </p>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 text-left">姓名</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 text-left">用户名</label>
                 <input
                   type="text"
                   value={tempName}
                   onChange={(e) => setTempName(e.target.value)}
-                  placeholder="请输入姓名"
+                  placeholder="请输入用户名"
                   className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
                   autoFocus
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 text-left">
-                  密码 {userId && <span className="text-gray-400 text-xs">(不修改请留空)</span>}
-                </label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 text-left">密码</label>
                 <input
                   type="password"
                   value={tempPassword}
                   onChange={(e) => setTempPassword(e.target.value)}
-                  placeholder={userId ? '请输入新密码' : '设置密码'}
+                  placeholder="请输入密码"
                   className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
                   onKeyDown={(e) => e.key === 'Enter' && handleSave()}
                 />
               </div>
             </div>
+            {passwordError && (
+              <p className="text-red-500 text-sm mt-3">{passwordError}</p>
+            )}
+            
+            <div className="mt-4 mb-2">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">
+                    或使用其他方式登录
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            <button
+              disabled
+              onClick={() => {
+                alert('微信登录功能正在申请中，请使用账号密码登录');
+              }}
+              className="w-full py-3 bg-gray-400 text-white rounded-lg font-medium cursor-not-allowed flex items-center justify-center gap-2 mt-4"
+              title="微信登录功能正在申请中"
+            >
+              <span className="text-xl">💬</span>
+              <span>微信登录（暂不可用）</span>
+            </button>
+            
             <div className="flex gap-3 justify-end mt-6">
               <button
                 onClick={() => {
-                  setTempName(userName);
+                  setTempName('');
                   setTempPassword('');
                   setIsEditing(false);
+                  setPasswordError('');
                 }}
                 className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
               >
@@ -261,10 +201,10 @@ export function HomePage() {
               </button>
               <button
                 onClick={handleSave}
-                disabled={!tempName.trim() || (!userId && !tempPassword.trim())}
+                disabled={!tempName.trim() || !tempPassword.trim()}
                 className="px-5 py-2 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                保存
+                登录
               </button>
             </div>
           </div>

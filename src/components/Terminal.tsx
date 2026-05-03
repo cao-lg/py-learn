@@ -53,17 +53,54 @@ export function Terminal({ logs, result, isRunning }: TerminalProps) {
           <p className="text-gray-200">{result.message}</p>
           {result.details && (
             <div className="mt-3 space-y-2 text-xs">
-              {result.details.expected && (
-                <div>
-                  <span className="text-gray-400">Expected: </span>
-                  <pre className="text-green-300 inline">{result.details.expected}</pre>
+              {result.details.testCases && result.details.testCases.length > 0 ? (
+                <div className="mt-2">
+                  <span className="text-gray-400 block mb-2">测试用例：</span>
+                  <div className="space-y-1">
+                    {result.details.testCases.map((tc, index) => (
+                      <div
+                        key={index}
+                        className={`flex items-center gap-2 p-2 rounded ${
+                          tc.passed
+                            ? 'bg-green-800/30'
+                            : 'bg-red-800/30'
+                        }`}
+                      >
+                        <span
+                          className={`w-1.5 h-1.5 rounded-full ${
+                            tc.passed ? 'bg-green-400' : 'bg-red-400'
+                          }`}
+                        />
+                        <span className="text-gray-300">{tc.name}</span>
+                        {!tc.passed && tc.expected && (
+                          <span className="text-gray-500 ml-auto">
+                            Expected: <span className="text-green-300">{tc.expected}</span>
+                          </span>
+                        )}
+                        {!tc.passed && tc.actual && (
+                          <span className="text-gray-500">
+                            Actual: <span className="text-red-300">{tc.actual}</span>
+                          </span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              )}
-              {result.details.actual && (
-                <div>
-                  <span className="text-gray-400">Actual: </span>
-                  <pre className="text-red-300 inline">{result.details.actual}</pre>
-                </div>
+              ) : (
+                <>
+                  {result.details.expected && (
+                    <div>
+                      <span className="text-gray-400">Expected: </span>
+                      <pre className="text-green-300 inline">{result.details.expected}</pre>
+                    </div>
+                  )}
+                  {result.details.actual && (
+                    <div>
+                      <span className="text-gray-400">Actual: </span>
+                      <pre className="text-red-300 inline">{result.details.actual}</pre>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           )}

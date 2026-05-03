@@ -1,19 +1,38 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-const ADMIN_PASSWORD = 'admin123';
+import { uumsClient } from '../utils/uums-api';
 
 export function AdminLoginPage() {
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async () => {
-    if (password === ADMIN_PASSWORD) {
-      localStorage.setItem('adminToken', '__admin__' + ADMIN_PASSWORD);
-      navigate('/admin');
-    } else {
-      setError('密码错误');
+    if (!username.trim() || !password.trim()) {
+      setError('请输入用户名和密码');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const result = await uumsClient.adminLogin(username.trim(), password);
+      
+      if (result && result.code === 200 && result.data) {
+        // 登录成功，保存token和用户信息
+        localStorage.setItem('adminUser', JSON.stringify(result.data.user));
+        navigate('/admin');
+      } else {
+        setError(result?.message || '登录失败');
+      }
+    } catch (err) {
+      console.error('登录错误:', err);
+      setError('网络错误，请稍后重试');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -25,11 +44,30 @@ export function AdminLoginPage() {
             <span className="text-3xl">🔐</span>
           </div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">管理员登录</h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-2">请输入管理员密码</p>
+          <p className="text-gray-500 dark:text-gray-400 mt-2">请输入管理员账号和密码</p>
         </div>
 
         <div className="space-y-4">
           <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 text-left">
+              用户名
+            </label>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => {
+                setUsername(e.target.value);
+                setError('');
+              }}
+              placeholder="请输入用户名"
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
+              autoFocus
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 text-left">
+              密码
+            </label>
             <input
               type="password"
               value={password}
@@ -40,16 +78,17 @@ export function AdminLoginPage() {
               onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
               placeholder="请输入密码"
               className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
-              autoFocus
             />
-            {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
           </div>
+
+          {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
 
           <button
             onClick={handleLogin}
-            className="w-full py-3 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors"
+            disabled={loading}
+            className="w-full py-3 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            登录
+            {loading ? '登录中...' : '登录'}
           </button>
 
           <button

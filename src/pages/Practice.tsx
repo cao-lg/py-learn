@@ -5,6 +5,7 @@ import { Terminal } from '../components/Terminal';
 import { evaluatorRouter } from '../evaluator/router';
 import { storage } from '../store/idb';
 import type { Question, EvalResult, PracticeSet } from '../types';
+import { uumsClient, getStoredUserId, getStoredUsername } from '../utils/uums-api';
 
 interface ChapterInfo {
   id: string;
@@ -24,7 +25,6 @@ export function PracticePage() {
   const [isRunning, setIsRunning] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [userId, setUserId] = useState('');
   const [isPasswordRequired, setIsPasswordRequired] = useState(false);
   const [inputPassword, setInputPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
@@ -32,46 +32,17 @@ export function PracticePage() {
 
   const currentChapterId = chapterId || 'ch01_basics';
 
-  const verifyPassword = async (userId: string, password: string) => {
-    try {
-      // 开发环境使用模拟数据
-      if (import.meta.env.DEV) {
-        console.log('Development mode: using mock data for password verification');
-        // 模拟验证成功
-        return true;
-      }
-
-      // 生产环境使用真实 API
-      const response = await fetch('/api/users/verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, password })
-      });
-      
-      if (!response.ok) {
-        // 检查是否是用户不存在的错误
-        if (response.status === 404) {
-          // 用户不存在，清理本地数据
-          localStorage.removeItem('userId');
-          localStorage.removeItem('userName');
-          navigate('/');
-          return false;
-        }
-        throw new Error('Failed to verify password');
-      }
-      
-      const data = await response.json();
-      return data.ok;
-    } catch (error) {
-      console.error('Password verification error:', error);
-      return false;
+  const verifyPassword = async (username: string, password: string): Promise<boolean> => {
+    const result = await uumsClient.verifyUser(username, password);
+    if (result && result.code === 200 && result.data.valid) {
+      return true;
     }
+    return false;
   };
 
   const checkAuth = useCallback(async () => {
-    const storedUserId = localStorage.getItem('userId');
-    setUserId(storedUserId || '');
-    
+    const storedUserId = getStoredUserId();
+
     if (storedUserId) {
       setIsPasswordRequired(true);
     } else {
@@ -80,8 +51,9 @@ export function PracticePage() {
   }, [navigate]);
 
   const handlePasswordVerify = async () => {
-    if (userId && inputPassword) {
-      const isVerified = await verifyPassword(userId, inputPassword);
+    const storedUsername = getStoredUsername();
+    if (storedUsername && inputPassword) {
+      const isVerified = await verifyPassword(storedUsername, inputPassword);
       if (isVerified) {
         setIsPasswordRequired(false);
         setIsAuthenticated(true);
@@ -136,9 +108,7 @@ export function PracticePage() {
   }, [currentQuestion]);
 
   useEffect(() => {
-    /* eslint-disable react-hooks/set-state-in-effect */
     checkAuth();
-    /* eslint-enable react-hooks/set-state-in-effect */
   }, [checkAuth]);
 
   useEffect(() => {
@@ -149,17 +119,13 @@ export function PracticePage() {
 
   useEffect(() => {
     if (currentChapterId && isAuthenticated) {
-      /* eslint-disable react-hooks/set-state-in-effect */
       loadPracticeSet(currentChapterId);
-      /* eslint-enable react-hooks/set-state-in-effect */
     }
   }, [currentChapterId, isAuthenticated, loadPracticeSet]);
 
   useEffect(() => {
     if (currentQuestion) {
-      /* eslint-disable react-hooks/set-state-in-effect */
       loadSavedCode();
-      /* eslint-enable react-hooks/set-state-in-effect */
     }
   }, [currentQuestion, loadSavedCode]);
 
@@ -174,36 +140,39 @@ export function PracticePage() {
     setResult(null);
   };
 
-  const syncPracticeRecord = async (chapterId: string, score: number, totalQuestions: number, answers: Record<string, string>) => {
-    try {
-      const userId = localStorage.getItem('userId');
-      if (!userId) return;
+  const syncPracticeRecord = async (chapterId: string, score: number, totalQuestions: number, answers: Record<string, string>, question: Question, chapter: ChapterInfo | undefined) => {
+    const storedUserId = getStoredUserId();
+    if (!storedUserId) return;
 
-      const response = await fetch('/api/sync', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId,
-          practice: {
-            [chapterId]: {
-              chapterId,
-              score,
-              totalQuestions,
-              completedAt: Date.now(),
-              answers
-            }
-          }
-        })
-      });
+    const userIdNum = parseInt(storedUserId, 10);
+    if (isNaN(userIdNum)) return;
 
-      if (!response.ok) {
-        console.error('Sync failed:', await response.text());
-      } else {
-        console.log('Practice record synced successfully');
-      }
-    } catch (error) {
-      console.error('Sync error:', error);
-    }
+    // 收集题目信息
+    const questionIds = JSON.stringify([question.id]);
+    const userAnswers = JSON.stringify(answers);
+    const codeSnippets = JSON.stringify({ [question.id]: answers[question.id] || '' });
+    const questionTitles = JSON.stringify({ [question.id]: question.title });
+    
+    // 计算掌握程度
+    const masteryLevel = score >= totalQuestions ? 'mastered' : 'practicing';
+
+    await uumsClient.recordStudyRecord({
+      user_id: userIdNum,
+      class_id: undefined,
+      exercise_title: chapterId,
+      exercise_type: 'practice',
+      score,
+      total_score: totalQuestions,
+      duration: 0,
+      completed_at: new Date().toISOString().replace('T', ' ').substring(0, 19),
+      chapter_id: chapterId,
+      chapter_name: chapter?.title || '',
+      question_ids: questionIds,
+      user_answers: userAnswers,
+      code_snippets: codeSnippets,
+      mastery_level: masteryLevel,
+      question_titles: questionTitles,
+    });
   };
 
   const handleRun = () => {
@@ -215,16 +184,15 @@ export function PracticePage() {
     evaluatorRouter.evaluate(currentQuestion, code, (evalResult) => {
       setResult(evalResult);
       setIsRunning(false);
-      
-      // 同步练习记录到后台
+
       if (evalResult) {
         const chapterId = currentChapterId;
-        // EvalResult 中的 score 已经是百分比值，我们需要转换为题目数量
         const score = evalResult.passed ? 1 : 0;
         const totalQuestions = 1;
         const answers = { [currentQuestion.id]: code };
-        
-        syncPracticeRecord(chapterId, score, totalQuestions, answers);
+        const currentChapter = chapters.find(ch => ch.id === chapterId);
+
+        syncPracticeRecord(chapterId, score, totalQuestions, answers, currentQuestion, currentChapter);
       }
     });
   };
@@ -341,12 +309,12 @@ export function PracticePage() {
             ))}
           </select>
         </div>
-        
+
         <div className="p-4 border-b border-gray-200 dark:border-gray-700">
           <h3 className="font-medium text-gray-700 dark:text-gray-300 mb-2">{practiceSet.title}</h3>
           <p className="text-sm text-gray-500">{practiceSet.description}</p>
         </div>
-        
+
         <nav className="p-2">
           {practiceSet.questions.map((q, index) => (
             <button
@@ -373,7 +341,6 @@ export function PracticePage() {
           <p className="text-gray-600 dark:text-gray-400 whitespace-pre-wrap">
             {currentQuestion.instruction}
           </p>
-          {/* 显示测试用例 */}
           {currentQuestion.testConfig.expected && (
             <div className="mt-4 p-3 bg-gray-100 dark:bg-gray-700 rounded-lg">
               <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">期望输出：</h4>

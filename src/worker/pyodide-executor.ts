@@ -1,4 +1,4 @@
-import type { TestConfig, PyodideWorkerMessage, PyodideWorkerResponse, EvalResult } from '../types';
+import type { TestConfig, PyodideWorkerMessage, PyodideWorkerResponse, EvalResult, TestCase } from '../types';
 import { compareOutputs } from '../utils/normalize';
 import { getExamAnswer } from './exam-answers';
 
@@ -53,9 +53,82 @@ input = mock_input
 `;
 }
 
+async function evaluateWithTestCases(code: string, testCases: TestCase[], examId?: string): Promise<EvalResult> {
+  if (!pyodide) {
+    return { passed: false, score: 0, message: 'Pyodide not initialized' };
+  }
+
+  const visibleTestCases = testCases.filter(tc => !tc.isHidden);
+  const allTestCases = examId ? testCases : visibleTestCases;
+
+  let totalScore = 0;
+  let maxScore = 0;
+  const results: { name: string; passed: boolean; expected?: string; actual?: string }[] = [];
+
+  for (const tc of allTestCases) {
+    const caseWeight = tc.weight ?? 1 / testCases.length;
+    maxScore += caseWeight;
+
+    try {
+      const wrappedCode = `
+import sys
+from io import StringIO
+_old_stdout = sys.stdout
+sys.stdout = StringIO()
+${code}
+_output = sys.stdout.getvalue()
+sys.stdout = _old_stdout
+_output
+`;
+      
+      const result = await pyodide.runPythonAsync(wrappedCode);
+      const capturedOutput = typeof result === 'string' ? result : String(result || '');
+      const expectedStr = String(tc.expected ?? '');
+
+      const { matched } = compareOutputs(expectedStr, capturedOutput);
+
+      if (matched) {
+        totalScore += caseWeight;
+        results.push({ name: tc.name, passed: true });
+      } else {
+        results.push({
+          name: tc.name,
+          passed: false,
+          expected: examId ? undefined : expectedStr,
+          actual: capturedOutput
+        });
+      }
+    } catch (e) {
+      const error = e instanceof Error ? e.message : String(e);
+      results.push({
+        name: tc.name,
+        passed: false,
+        expected: examId ? undefined : String(tc.expected ?? ''),
+        actual: `Error: ${error}`
+      });
+    }
+  }
+
+  const passed = totalScore >= maxScore;
+  const message = passed ? 'All test cases passed!' : `Some test cases failed. ${results.filter(r => !r.passed).length}/${results.length} failed.`;
+
+  return {
+    passed,
+    score: totalScore,
+    message,
+    details: {
+      testCases: examId ? results.filter(r => !r.passed) : results
+    }
+  };
+}
+
 async function evaluateOutput(code: string, config: TestConfig, examId?: string, questionId?: string): Promise<EvalResult> {
   if (!pyodide) {
     return { passed: false, score: 0, message: 'Pyodide not initialized' };
+  }
+
+  if (config.testCases && config.testCases.length > 0) {
+    return evaluateWithTestCases(code, config.testCases, examId);
   }
 
   let expected = config.expected;
@@ -92,7 +165,6 @@ _output
     const { matched, diff } = compareOutputs(expected, capturedOutput);
 
     if (matched) {
-      // 练习模式下始终展示完整信息
       if (!examId) {
         return {
           passed: true,
@@ -111,7 +183,6 @@ _output
       };
     }
 
-    // 练习模式展示完整信息，考试模式只展示错误信息但不展示期望输出
     if (!examId) {
       return {
         passed: false,
@@ -170,7 +241,6 @@ _output
     const { matched, diff } = compareOutputs(expected || '', stdout);
 
     if (matched) {
-      // 练习模式下始终展示完整信息
       if (!examId) {
         return {
           passed: true,
@@ -189,7 +259,6 @@ _output
       };
     }
 
-    // 练习模式展示完整信息，考试模式只展示错误信息但不展示期望输出
     if (!examId) {
       return {
         passed: false,
@@ -251,7 +320,6 @@ _test_function()
     const result = await pyodide.runPythonAsync(testCode);
     
     if (Array.isArray(result) && result.every((r: unknown) => r === true)) {
-      // 练习模式下展示完整信息
       if (!examId) {
         return {
           passed: true,
@@ -269,7 +337,6 @@ _test_function()
       };
     }
 
-    // 练习模式展示完整信息
     if (!examId) {
       return {
         passed: false,

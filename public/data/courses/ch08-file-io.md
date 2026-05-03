@@ -1,11 +1,13 @@
 # 文件操作
 
-<div class="intro-card">
-  <h3>📖 章节导学</h3>
-  <p>文件操作允许程序读取和写入文件，实现数据的持久化存储。</p>
+<div className="intro-card">
+  <h3>🎯 学习目标</h3>
+  <p>本章核心目标：掌握文件读写操作和 JSON 数据处理。</p>
 </div>
 
-## 读写文本文件
+---
+
+## 一、读写文本文件
 
 ```python
 # 读取文件
@@ -27,7 +29,9 @@ with open("output.txt", "a", encoding="utf-8") as f:
     f.write("\n这是追加的内容")
 ```
 
-## JSON 数据处理
+---
+
+## 二、JSON 数据处理
 
 ```python
 import json
@@ -49,7 +53,9 @@ with open("output.json", "w", encoding="utf-8") as f:
     json.dump(data, f, ensure_ascii=False, indent=2)
 ```
 
-## 上下文管理器
+---
+
+## 三、上下文管理器
 
 使用 `with` 语句确保文件正确关闭：
 
@@ -65,35 +71,30 @@ content = f.read()
 f.close()  # 容易忘记，而且可能出异常时不执行
 ```
 
-## 文件操作函数
+---
 
-```python
-import os
+## ✅ 本章核心技能清单
 
-os.path.exists("file.txt")      # 文件是否存在
-os.path.isfile("file.txt")      # 是否是文件
-os.path.isdir("folder")         # 是否是目录
-os.path.getsize("file.txt")     # 文件大小（字节）
-os.path.getmtime("file.txt")    # 修改时间（时间戳）
-
-# 目录操作
-os.listdir(".")                 # 列出目录内容
-os.mkdir("new_folder")         # 创建目录
-os.makedirs("a/b/c")            # 递归创建目录
-os.remove("file.txt")           # 删除文件
-os.rmdir("empty_folder")        # 删除空目录
-```
+| 技能点 | 掌握程度 | 练习建议 |
+|--------|----------|---------|
+| 文件读取 | ★★★ | read/readlines |
+| 文件写入 | ★★★ | write/writelines |
+| JSON序列化 | ★★★ | json.dumps/json.dump |
+| JSON反序列化 | ★★★ | json.loads/json.load |
+| 上下文管理器 | ★★★ | with语句 |
 
 ---
 
-## 📝 随堂练习
+<div className="practice-box">
+## 📝 技能自测
 
-👉 前往 [练习页面](/practice/ch08_file_io) 完成以下任务：
+1. `with` 语句的作用是什么？
+2. `json.dumps()` 和 `json.dump()` 的区别是什么？
+3. 为什么要指定 encoding="utf-8"？
 
-1. **读取文件** - 读取一个文本文件并统计行数
-2. **JSON 处理** - 读写 JSON 格式的配置文件
-3. **批量重命名** - 批量重命名文件夹中的文件
+👉 [开始练习](/practice/ch08_file_io)
+</div>
 
 ---
 
-**[下一章预告]** → 异常处理：处理程序运行中的错误
+**[下一章]** → 异常处理

@@ -1,5 +1,6 @@
 import { storage } from './idb';
 import type { SyncPayload } from '../types';
+import { uumsClient, getStoredUserId } from '../utils/uums-api';
 
 class SyncQueue {
   private isOnline: boolean = navigator.onLine;
@@ -48,12 +49,8 @@ class SyncQueue {
 
     for (const item of queue) {
       try {
-        const response = await fetch('/api/sync', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(item),
-        });
-        if (!response.ok) {
+        const success = await this.syncToUUMS(item as SyncPayload);
+        if (!success) {
           failedItems.push(item);
         }
       } catch {
@@ -69,6 +66,52 @@ class SyncQueue {
     } else {
       await storage.clearSyncQueue();
     }
+  }
+
+  private async syncToUUMS(payload: SyncPayload): Promise<boolean> {
+    const userId = getStoredUserId();
+    if (!userId) return false;
+
+    const userIdNum = parseInt(userId, 10);
+    if (isNaN(userIdNum)) return false;
+
+    if (payload.practice && Object.keys(payload.practice).length > 0) {
+      for (const [chapterId, record] of Object.entries(payload.practice)) {
+        const result = await uumsClient.recordStudyRecord({
+          user_id: userIdNum,
+          class_id: undefined,
+          exercise_title: chapterId,
+          exercise_type: record.exercise_type || 'practice',
+          score: record.score,
+          total_score: record.totalQuestions,
+          duration: 0,
+          completed_at: new Date(record.completedAt).toISOString().replace('T', ' ').substring(0, 19),
+        });
+        if (!result || result.code !== 0) {
+          return false;
+        }
+      }
+    }
+
+    if (payload.exam && Object.keys(payload.exam).length > 0) {
+      for (const [examId, record] of Object.entries(payload.exam)) {
+        const result = await uumsClient.recordExamRecord({
+          user_id: userIdNum,
+          class_id: undefined,
+          exam_title: examId,
+          exam_type: 'exam',
+          score: record.score,
+          total_score: record.totalQuestions,
+          status: 'submitted',
+          submitted_at: new Date(record.completedAt).toISOString().replace('T', ' ').substring(0, 19),
+        });
+        if (!result || result.code !== 0) {
+          return false;
+        }
+      }
+    }
+
+    return true;
   }
 }
 

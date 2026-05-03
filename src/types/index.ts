@@ -1,3 +1,11 @@
+export interface TestCase {
+  name: string;
+  input?: string | unknown[] | Record<string, unknown> | null;
+  expected: string | number | boolean | unknown[] | Record<string, unknown> | null;
+  isHidden?: boolean;
+  weight?: number;
+}
+
 export interface TestConfig {
   expected?: string | null;
   mockInputs?: string[];
@@ -5,6 +13,7 @@ export interface TestConfig {
   timeout_ms: number;
   constraints?: Record<string, unknown>;
   hiddenCases?: unknown[];
+  testCases?: TestCase[];
 }
 
 export interface Hint {
@@ -16,6 +25,8 @@ export interface Question {
   id: string;
   type: 'output' | 'function' | 'interactive' | 'unittest' | 'constraint' | 'debug';
   title: string;
+  skill?: string;
+  difficulty?: number;
   instruction: string;
   initialCode: string;
   testConfig: TestConfig;
@@ -31,6 +42,7 @@ export interface PracticeSet {
   id: string;
   title: string;
   description: string;
+  skillPoints?: string[];
   questions: Question[];
 }
 
@@ -65,6 +77,12 @@ export interface EvalResult {
     expected?: string;
     actual?: string;
     hint?: string;
+    testCases?: {
+      name: string;
+      passed: boolean;
+      expected?: string;
+      actual?: string;
+    }[];
   };
 }
 
@@ -96,6 +114,7 @@ export interface SyncPayload {
     totalQuestions: number;
     completedAt: number;
     answers: Record<string, string>;
+    exercise_type?: string;
   }>;
   exam: Record<string, {
     examId: string;

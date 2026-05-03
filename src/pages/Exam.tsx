@@ -9,6 +9,7 @@ import { syncQueue } from '../store/sync-queue';
 import { generateDeterministicSeed, shuffleArray } from '../utils/crypto';
 import { checkExamAvailability, formatDateTime } from '../utils/exam-schedule';
 import type { ExamSet, ExamQuestion, ExamSession, EvalResult, SyncPayload, Question, TestConfig, ExamInfo } from '../types';
+import { getStoredUserId } from '../utils/uums-api';
 
 export function ExamPage() {
   const { examId } = useParams<{ examId?: string }>();
@@ -35,7 +36,7 @@ export function ExamPage() {
     setLoading(true);
     setError(null);
     try {
-      const userId = localStorage.getItem('userId');
+      const userId = getStoredUserId();
       if (!userId) {
         throw new Error('请先设置身份');
       }
@@ -43,7 +44,7 @@ export function ExamPage() {
       const examIndexResponse = await fetch('/data/exam/_index.json');
       let examInfo: any = null;
       let hasMultipleVersions = false;
-      
+
       if (examIndexResponse.ok) {
         const examIndex = await examIndexResponse.json();
         examInfo = examIndex.exams.find((e: ExamInfo) => e.id === examId);
@@ -63,20 +64,15 @@ export function ExamPage() {
         }
       }
 
-      // 检查是否有现有会话
       const existingSessionCheck = await storage.getExamSession(examId || 'mid_term', userId);
       let versionId: string = examId || 'mid_term';
-      
-      // 如果有多版本考试
+
       if (hasMultipleVersions && examId === 'final_exam') {
         if (existingSessionCheck && existingSessionCheck.exam_id !== examId) {
-          // 已有会话，使用之前的版本
           versionId = existingSessionCheck.exam_id;
         } else {
-          // 随机选择A、B、C卷
           const versions = ['final_exam_A', 'final_exam_B', 'final_exam_C'];
           const seed = await generateDeterministicSeed(userId, examId || 'final_exam');
-          // 确保seed是数字
           const seedNumber = parseInt(seed, 16) || 0;
           const versionIndex = Math.abs(seedNumber % 3);
           versionId = versions[versionIndex];
@@ -154,7 +150,7 @@ export function ExamPage() {
     if (now - lastSyncRef.current < 10000) return;
     lastSyncRef.current = now;
 
-    const userId = localStorage.getItem('userId');
+    const userId = getStoredUserId();
     if (!userId) return;
 
     const payload: SyncPayload = {
@@ -181,10 +177,8 @@ export function ExamPage() {
   }, [examSet, session, answers, audit]);
 
   useEffect(() => {
-    /* eslint-disable react-hooks/set-state-in-effect */
     loadExam();
     setupAuditListeners();
-    /* eslint-enable react-hooks/set-state-in-effect */
     syncQueue.startAutoSync(30000);
 
     return () => {
@@ -207,7 +201,7 @@ export function ExamPage() {
     const confirmed = window.confirm('Are you sure you want to submit? This action cannot be undone.');
     if (!confirmed) return;
 
-    const userId = localStorage.getItem('userId');
+    const userId = getStoredUserId();
     if (!userId) return;
 
     const score = calculateScore();

@@ -1,11 +1,13 @@
 # 数据结构
 
-<div class="intro-card">
-  <h3>📖 章节导学</h3>
-  <p>Python 提供了四种内置数据结构：列表、元组、字典和集合，用于组织和存储数据。</p>
+<div className="intro-card">
+  <h3>🎯 学习目标</h3>
+  <p>本章核心目标：掌握列表、元组、字典和集合的基本操作和使用场景。</p>
 </div>
 
-## 列表 (List)
+---
+
+## 一、列表 (List)
 
 列表是**可变**的有序序列：
 
@@ -13,7 +15,6 @@
 # 创建列表
 fruits = ["苹果", "香蕉", "橙子"]
 numbers = [1, 2, 3, 4, 5]
-mixed = [1, "hello", True, 3.14]
 
 # 索引和切片
 fruits[0]     # "苹果"（第一个元素）
@@ -24,15 +25,14 @@ fruits[1:3]   # ["香蕉", "橙子"]（切片）
 fruits.append("葡萄")    # 末尾添加
 fruits.insert(1, "梨")  # 指定位置插入
 fruits.remove("香蕉")    # 删除元素
-popped = fruits.pop()    # 弹出并返回最后一个元素
 
-# 列表操作
-len(fruits)    # 长度
-sorted(fruits) # 排序（返回新列表）
-fruits.sort() # 原地排序
+# 列表推导式
+squares = [x**2 for x in range(1, 6)]  # [1, 4, 9, 16, 25]
 ```
 
-## 元组 (Tuple)
+---
+
+## 二、元组 (Tuple)
 
 元组是**不可变**的有序序列：
 
@@ -41,15 +41,17 @@ fruits.sort() # 原地排序
 point = (3, 4)
 colors = ("红", "绿", "蓝")
 
-# 不可修改
-# point[0] = 5  # 会报错！
-
-# 元组解包
+# 元组解包（Python特色）
 x, y = point
 print(f"x={x}, y={y}")  # x=3, y=4
+
+# 单元素元组（注意逗号）
+single = (5,)  # 不是 (5)，那是整数
 ```
 
-## 字典 (Dict)
+---
+
+## 三、字典 (Dict)
 
 字典存储**键值对**：
 
@@ -62,7 +64,7 @@ person = {
 }
 
 # 访问和修改
-print(person["name"])     # "Alice"
+person["name"]     # "Alice"
 person["age"] = 21       # 修改值
 person["email"] = "a@b.com"  # 添加新键值对
 
@@ -70,11 +72,12 @@ person["email"] = "a@b.com"  # 添加新键值对
 person.keys()    # 所有键
 person.values()  # 所有值
 person.items()   # 所有键值对
-person.get("name")     # 安全获取（不存在返回 None）
-person.get("gender", "未知")  # 默认值
+person.get("gender", "未知")  # 安全获取（带默认值）
 ```
 
-## 集合 (Set)
+---
+
+## 四、集合 (Set)
 
 集合是**无序不重复**的元素集合：
 
@@ -83,30 +86,38 @@ person.get("gender", "未知")  # 默认值
 colors = {"红", "绿", "蓝"}
 nums = {1, 2, 3, 2, 1}  # 自动去重：{1, 2, 3}
 
-# 集合操作
-colors.add("黄")     # 添加元素
-colors.remove("红")  # 删除元素（不存在会报错）
-colors.discard("紫") # 删除（不存在不报错）
-
 # 数学运算
 a = {1, 2, 3}
 b = {2, 3, 4}
 print(a | b)   # {1, 2, 3, 4}  并集
 print(a & b)   # {2, 3}         交集
 print(a - b)   # {1}             差集
-print(a ^ b)   # {1, 4}         对称差集
 ```
 
 ---
 
-## 📝 随堂练习
+## ✅ 本章核心技能清单
 
-👉 前往 [练习页面](/practice/ch06_data_structures) 完成以下任务：
-
-1. **列表操作** - 列表的增删改查
-2. **字典应用** - 用字典统计词频
-3. **集合运算** - 求两个集合的交集和并集
+| 技能点 | 掌握程度 | 练习建议 |
+|--------|----------|---------|
+| 列表基本操作 | ★★★ | 增删改查 |
+| 列表推导式 | ★★★ | 简化代码 |
+| 元组解包 | ★★★ | Python特色 |
+| 字典操作 | ★★★ | 键值对管理 |
+| 集合运算 | ★★☆ | 去重和集合操作 |
 
 ---
 
-**[下一章预告]** → 字符串处理：字符串的常用操作和方法
+<div className="practice-box">
+## 📝 技能自测
+
+1. 列表和元组的主要区别是什么？
+2. 如何安全获取字典中不存在的键？
+3. 集合的主要特性是什么？
+
+👉 [开始练习](/practice/ch06_data_structures)
+</div>
+
+---
+
+**[下一章]** → 字符串处理

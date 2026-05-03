@@ -7,8 +7,25 @@
       "enum": ["output", "function", "interactive", "unittest", "constraint", "debug"]
     },
     "title": { "type": "string" },
+    "skill": { "type": "string" },
+    "difficulty": { "type": "integer", "minimum": 1, "maximum": 3 },
     "instruction": { "type": "string" },
     "initialCode": { "type": "string" },
+    "testCases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "input": { "type": ["string", "array", "object", "null"] },
+          "expected": { "type": ["string", "number", "boolean", "array", "object", "null"] },
+          "isHidden": { "type": "boolean", "default": false },
+          "weight": { "type": "number", "minimum": 0, "maximum": 1 }
+        },
+        "required": ["name", "expected"]
+      },
+      "minItems": 1
+    },
     "testConfig": {
       "type": "object",
       "properties": {
@@ -22,12 +39,15 @@
       "required": ["timeout_ms"]
     },
     "hints": {
-      "type": "object",
-      "properties": {
-        "text": { "type": "string" },
-        "visible": { "type": "boolean" }
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "text": { "type": "string" },
+          "visible": { "type": "boolean" }
+        }
       }
     }
   },
-  "required": ["id", "type", "title", "instruction", "initialCode", "testConfig"]
+  "required": ["id", "type", "title", "skill", "instruction", "initialCode"]
 }

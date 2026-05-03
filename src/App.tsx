@@ -11,20 +11,32 @@ import { AdminUsersPage } from './pages/AdminUsers';
 import { AdminStudentDetailPage } from './pages/AdminStudentDetail';
 import { HomePage } from './pages/Home';
 import { LearnPage } from './pages/Learn';
+import { TestLoginPage } from './pages/TestLogin';
+import { SimpleTestPage } from './pages/SimpleTest';
+import { DiagnosticPage } from './pages/Diagnostic';
+import { WechatCallbackPage } from './pages/WechatCallback';
+import { MockWechatLoginPage } from './pages/MockWechatLogin';
+import { MyRecordsPage } from './pages/MyRecords';
+import { TestRecordPage } from './pages/TestRecord';
+import { KnowledgeGraphPage } from './pages/KnowledgeGraph';
+import { MyStatsPage } from './pages/MyStats';
 
 function ProtectedNav() {
   return (
     <nav className="flex gap-6">
       <a href="/learn" className="text-gray-600 dark:text-gray-300 hover:text-purple-600">
-        学
+        学习
       </a>
       <a href="/practice" className="text-gray-600 dark:text-gray-300 hover:text-purple-600">
-        练
+        练习
       </a>
       <a href="/exam" className="text-gray-600 dark:text-gray-300 hover:text-purple-600">
-        考
+        考试
       </a>
-      <a href="/admin" className="text-gray-600 dark:text-gray-300 hover:text-purple-600">
+      <a href="/my-stats" className="text-gray-600 dark:text-gray-300 hover:text-purple-600">
+        统计
+      </a>
+      <a href="/admin" className="text-gray-600 dark:text-gray-300 hover:text-purple-600 font-bold">
         管理
       </a>
     </nav>
@@ -89,6 +101,15 @@ export function App() {
           <Route path="/admin/settings" element={<AdminSettingsPage />} />
           <Route path="/admin/users" element={<AdminUsersPage />} />
           <Route path="/admin/users/:id" element={<AdminStudentDetailPage />} />
+          <Route path="/admin/knowledge-graph" element={<KnowledgeGraphPage />} />
+          <Route path="/test-login" element={<TestLoginPage />} />
+          <Route path="/simple-test" element={<SimpleTestPage />} />
+          <Route path="/diagnostic" element={<DiagnosticPage />} />
+          <Route path="/login/callback" element={<WechatCallbackPage />} />
+          <Route path="/mock-wechat-login" element={<MockWechatLoginPage />} />
+          <Route path="/my-records" element={<MyRecordsPage />} />
+          <Route path="/test-record" element={<TestRecordPage />} />
+          <Route path="/my-stats" element={<MyStatsPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>

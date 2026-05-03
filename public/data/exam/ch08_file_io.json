@@ -1,94 +1,48 @@
 {
-  "id": "ch08_file_io",
-  "title": "第八章测验：文件操作",
-  "description": "测试文件读写和 JSON 数据处理",
-  "duration": 20,
-  "totalScore": 100,
-  "passingScore": 60,
+  "title": "第八章文件操作",
+  "description": "掌握文件读写和json处理",
   "questions": [
     {
-      "id": "ex8_q1",
-      "type": "output",
-      "title": "StringIO读取",
-      "instruction": "使用 StringIO 读取字符串 'Hello' 并打印。\n\n期望输出：Hello",
-      "initialCode": "from io import StringIO\n\nf = StringIO('Hello')\n# 在下方编写代码\n",
-      "testConfig": {
-        "expected": "Hello",
-        "timeout_ms": 5000
-      },
-      "hints": [
-        { "text": "f.read()", "visible": false }
-      ]
+      "id": 1,
+      "type": "code",
+      "question": "从模拟文件读取内容。使用 from io import StringIO, f = StringIO('Hello')，然后读取并打印 f.read() 的结果。",
+      "initialCode": "from io import StringIO\nf = StringIO('Hello')\n# 在这里添加代码读取并打印",
+      "expected": "Hello"
     },
     {
-      "id": "ex8_q2",
-      "type": "output",
-      "title": "JSON序列化",
-      "instruction": "将字典 {'name': 'Alice', 'age': 20} 转为 JSON 字符串并打印。",
-      "initialCode": "import json\n\ndata = {'name': 'Alice', 'age': 20}\n# 在下方编写代码\n",
-      "testConfig": {
-        "expected": "{\"name\": \"Alice\", \"age\": 20}",
-        "timeout_ms": 5000
-      },
-      "hints": [
-        { "text": "json.dumps(data)", "visible": false }
-      ]
+      "id": 2,
+      "type": "code",
+      "question": "将字典 {'name': 'Alice', 'age': 20} 转换为 JSON 字符串并打印。",
+      "initialCode": "import json\ndata = {'name': 'Alice', 'age': 20}\njson_str = json.dumps(data)\nprint(json_str)",
+      "expected": "{\"name\": \"Alice\", \"age\": 20}"
     },
     {
-      "id": "ex8_q3",
-      "type": "output",
-      "title": "JSON反序列化",
-      "instruction": "将 JSON 字符串 '{\"score\": 95}' 转为字典，获取 score 的值。\n\n期望输出：95",
-      "initialCode": "import json\n\ns = '{\"score\": 95}'\n# 在下方编写代码\n",
-      "testConfig": {
-        "expected": "95",
-        "timeout_ms": 5000
-      },
-      "hints": [
-        { "text": "json.loads(s)['score']", "visible": false }
-      ]
+      "id": 3,
+      "type": "code",
+      "question": "将 JSON 字符串 '{\"score\": 95}' 转换为字典并打印 score 的值。",
+      "initialCode": "import json\njson_str = '{\"score\": 95}'\ndata = json.loads(json_str)\nprint(data['score'])",
+      "expected": "95"
     },
     {
-      "id": "ex8_q4",
-      "type": "output",
-      "title": "StringIO写入",
-      "instruction": "使用 StringIO 写入 'World'，然后获取并打印内容。\n\n期望输出：World",
-      "initialCode": "from io import StringIO\n\nf = StringIO()\nf.write('World')\n# 在下方编写代码\n",
-      "testConfig": {
-        "expected": "World",
-        "timeout_ms": 5000
-      },
-      "hints": [
-        { "text": "f.getvalue()", "visible": false }
-      ]
+      "id": 4,
+      "type": "code",
+      "question": "向模拟文件写入 'World'，然后获取并打印内容。使用 from io import StringIO。",
+      "initialCode": "from io import StringIO\nf = StringIO()\n# 在这里添加代码写入'World'并打印",
+      "expected": "World"
     },
     {
-      "id": "ex8_q5",
-      "type": "output",
-      "title": "JSON格式化输出",
-      "instruction": "将字典 {'a': 1, 'b': 2} 转为带缩进（indent=2）的 JSON 字符串。",
-      "initialCode": "import json\n\ndata = {'a': 1, 'b': 2}\n# 在下方编写代码\n",
-      "testConfig": {
-        "expected": "{\n  \"a\": 1,\n  \"b\": 2\n}",
-        "timeout_ms": 5000
-      },
-      "hints": [
-        { "text": "json.dumps(data, indent=2)", "visible": false }
-      ]
+      "id": 5,
+      "type": "code",
+      "question": "将字典 {'a': 1, 'b': 2} 以缩进 2 格式转换为 JSON 字符串并打印。",
+      "initialCode": "import json\ndata = {'a': 1, 'b': 2}\njson_str = json.dumps(data, indent=2)\nprint(json_str)",
+      "expected": "{\n  \"a\": 1,\n  \"b\": 2\n}"
     },
     {
-      "id": "ex8_q6",
-      "type": "output",
-      "title": "seek操作",
-      "instruction": "StringIO 写入 'test' 后，seek 到开头再读取。\n\n期望输出：test",
-      "initialCode": "from io import StringIO\n\nf = StringIO()\nf.write('test')\nf.seek(0)\n# 在下方编写代码\n",
-      "testConfig": {
-        "expected": "test",
-        "timeout_ms": 5000
-      },
-      "hints": [
-        { "text": "f.read()", "visible": false }
-      ]
+      "id": 6,
+      "type": "code",
+      "question": "向模拟文件写入 'Hello'，移动指针到开头，然后读取并打印。",
+      "initialCode": "from io import StringIO\nf = StringIO()\n# 在这里添加代码写入'Hello'、移动指针到开头并读取",
+      "expected": "Hello"
     }
   ]
 }

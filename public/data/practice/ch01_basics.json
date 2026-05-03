@@ -1,222 +1,213 @@
 {
   "id": "ch01_basics",
-  "title": "Python 基础 - 第一章：Python 简介",
-  "description": "学习 Python 基本语法和第一个程序",
+  "title": "第一章：Python 基础",
+  "description": "掌握 print() 输出和基本数学运算",
+  "skillPoints": ["print()函数", "字符串表示", "数学运算", "运算优先级", "格式化输出"],
   "questions": [
     {
       "id": "q01_hello",
       "type": "output",
-      "title": "Hello World",
-      "instruction": "编写程序，使用 `print()` 函数输出字符串 `Hello, World!`。\n\n这是你的第一个 Python 程序！",
+      "title": "基础输出",
+      "skill": "print()函数",
+      "instruction": "使用 `print()` 函数输出 `Hello, World!`",
       "initialCode": "# 在下方编写代码\n",
+      "testCases": [
+        { "name": "基本测试", "expected": "Hello, World!", "weight": 1.0 }
+      ],
       "testConfig": {
         "expected": "Hello, World!",
         "timeout_ms": 5000
       },
       "hints": [
-        { "text": "使用 print() 函数", "visible": true },
-        { "text": "字符串需要用引号包裹", "visible": false }
-      ]
+        { "text": "print(\"Hello, World!\")", "visible": true }
+      ],
+      "difficulty": 1
     },
     {
-      "id": "q02_multiline",
+      "id": "q02_single_quote",
+      "type": "output",
+      "title": "单引号输出",
+      "skill": "字符串表示",
+      "instruction": "使用单引号输出字符串 `I'm learning Python!`",
+      "initialCode": "# 在下方编写代码\n",
+      "testCases": [
+        { "name": "基本测试", "expected": "I'm learning Python!", "weight": 1.0 }
+      ],
+      "testConfig": {
+        "expected": "I'm learning Python!",
+        "timeout_ms": 5000
+      },
+      "hints": [
+        { "text": "print('I'm learning Python!')", "visible": true }
+      ],
+      "difficulty": 1
+    },
+    {
+      "id": "q03_multiline",
       "type": "output",
       "title": "多行输出",
-      "instruction": "使用一条 `print()` 语句，输出以下三行：\n第一行：Open\n第二行：the\n第三行：Door",
+      "skill": "字符串表示",
+      "instruction": "使用三引号输出以下三行内容：\n第一行：Python\n第二行：is\n第三行：fun!",
       "initialCode": "# 在下方编写代码\n",
+      "testCases": [
+        { "name": "基本测试", "expected": "Python\nis\nfun!", "weight": 1.0 }
+      ],
       "testConfig": {
-        "expected": "Open\nthe\nDoor",
+        "expected": "Python\nis\nfun!",
         "timeout_ms": 5000
       },
       "hints": [
-        { "text": "使用 \\\\n 表示换行", "visible": true }
-      ]
+        { "text": "使用三引号 \"\"\"...\"\"\"", "visible": true }
+      ],
+      "difficulty": 2
     },
     {
-      "id": "q03_calc",
+      "id": "q04_basic_math",
       "type": "output",
-      "title": "表达式计算",
-      "instruction": "计算 `(15 + 35) * 2 - 100 / 4`，打印结果。",
+      "title": "基础运算",
+      "skill": "数学运算",
+      "instruction": "计算 `25 + 37 - 12 * 2` 的结果并打印",
       "initialCode": "# 在下方编写代码\n",
+      "testCases": [
+        { "name": "基础测试", "expected": "38", "weight": 0.5 },
+        { "name": "边界测试-纯加法", "input": "print(10 + 20)", "expected": "30", "isHidden": true, "weight": 0.25 },
+        { "name": "边界测试-纯乘法", "input": "print(5 * 6)", "expected": "30", "isHidden": true, "weight": 0.25 }
+      ],
       "testConfig": {
-        "expected": "80.0",
+        "expected": "38",
         "timeout_ms": 5000
       },
       "hints": [
-        { "text": "先算括号，再乘除，后加减", "visible": true }
-      ]
+        { "text": "先乘后加减", "visible": true }
+      ],
+      "difficulty": 2
     },
     {
-      "id": "q04_mod_calc",
+      "id": "q05_advanced_math",
       "type": "output",
-      "title": "取模运算",
-      "instruction": "一个三位数 369，输出它的百位、十位、个位数字之和。\n\n例如：369 -> 3 + 6 + 9 = 18",
-      "initialCode": "num = 369\n# 在下方编写代码\n",
-      "testConfig": {
-        "expected": "18",
-        "timeout_ms": 5000
-      },
-      "hints": [
-        { "text": "百位 = num // 100", "visible": true },
-        { "text": "十位 = (num % 100) // 10", "visible": false }
-      ]
-    },
-    {
-      "id": "q05_swap_calc",
-      "type": "output",
-      "title": "交换与计算",
-      "instruction": "已知 `a = 7`, `b = 3`。不使用第三变量，交换它们的值，然后计算 `a的b次方`，打印结果。",
-      "initialCode": "a = 7\nb = 3\n# 在下方编写代码\n",
-      "testConfig": {
-        "expected": "343",
-        "timeout_ms": 5000
-      },
-      "hints": [
-        { "text": "先交换，再用 ** 求幂", "visible": true }
-      ]
-    },
-    {
-      "id": "q06_math_expr",
-      "type": "output",
-      "title": "数学表达式",
-      "instruction": "计算 `2的20次方除以17的余数`，打印结果。\n\n提示：这是密码学中常用的模幂运算",
+      "title": "进阶运算",
+      "skill": "数学运算",
+      "instruction": "计算并打印：\n1. 100 除以 7 的商（整除）\n2. 100 除以 7 的余数",
       "initialCode": "# 在下方编写代码\n",
+      "testCases": [
+        { "name": "基础测试", "expected": "14\n2", "weight": 0.6 },
+        { "name": "边界测试-整除边界", "input": "print(14 // 7)\nprint(14 % 7)", "expected": "2\n0", "isHidden": true, "weight": 0.2 },
+        { "name": "边界测试-负数", "input": "print(-10 // 3)\nprint(-10 % 3)", "expected": "-4\n2", "isHidden": true, "weight": 0.2 }
+      ],
       "testConfig": {
-        "expected": "9",
+        "expected": "14\n2",
         "timeout_ms": 5000
       },
       "hints": [
-        { "text": "先算 2**20，再对 17 取模", "visible": true }
-      ]
+        { "text": "// 整除，% 取余", "visible": true }
+      ],
+      "difficulty": 2
     },
     {
-      "id": "q07_grade_calc",
+      "id": "q06_power",
       "type": "output",
-      "title": "成绩等级转换",
-      "instruction": "已知百分制成绩 `score = 87`，将其转换为五分制等级：\n90-100 -> A (4.0)\n80-89 -> B (3.0)\n70-79 -> C (2.0)\n60-69 -> D (1.0)\n60以下 -> F (0.0)\n\n打印对应的绩点。",
-      "initialCode": "score = 87\n# 在下方编写代码\n",
+      "title": "幂运算",
+      "skill": "数学运算",
+      "instruction": "计算 `2 的 10 次方` 并打印结果",
+      "initialCode": "# 在下方编写代码\n",
+      "testCases": [
+        { "name": "基础测试", "expected": "1024", "weight": 0.5 },
+        { "name": "边界测试-平方", "input": "print(5 ** 2)", "expected": "25", "isHidden": true, "weight": 0.25 },
+        { "name": "边界测试-0次方", "input": "print(10 ** 0)", "expected": "1", "isHidden": true, "weight": 0.25 }
+      ],
       "testConfig": {
-        "expected": "3.0",
+        "expected": "1024",
         "timeout_ms": 5000
       },
       "hints": [
-        { "text": "使用多个 if-elif 判断分数区间", "visible": true }
-      ]
+        { "text": "使用 ** 运算符", "visible": true }
+      ],
+      "difficulty": 1
     },
     {
-      "id": "q08_circle",
+      "id": "q07_parentheses",
       "type": "output",
-      "title": "圆的相关计算",
-      "instruction": "已知圆的半径 `r = 5`，计算并打印：\n1. 圆的周长 (2 * π * r)\n2. 圆的面积 (π * r²)\n\n使用 `math` 模块的 `pi` 常量。\n\n格式：每行一个数字，保留2位小数",
-      "initialCode": "import math\nr = 5\n# 在下方编写代码\n",
+      "title": "括号优先级",
+      "skill": "运算优先级",
+      "instruction": "计算 `(15 + 35) * 2 - 100 / 4` 并打印结果",
+      "initialCode": "# 在下方编写代码\n",
+      "testCases": [
+        { "name": "基础测试", "expected": "75.0", "weight": 0.6 },
+        { "name": "边界测试-无括号", "input": "print(15 + 35 * 2 - 100 / 4)", "expected": "60.0", "isHidden": true, "weight": 0.2 },
+        { "name": "边界测试-除法精度", "input": "print(100 / 4)", "expected": "25.0", "isHidden": true, "weight": 0.2 }
+      ],
       "testConfig": {
-        "expected": "31.42\n78.54",
+        "expected": "75.0",
         "timeout_ms": 5000
       },
       "hints": [
-        { "text": "使用 math.pi 获取 π 值", "visible": true },
-        { "text": "使用 round(value, 2) 或 f'{value:.2f}' 保留小数", "visible": false }
-      ]
+        { "text": "先算括号内，再算乘除，最后加减", "visible": true }
+      ],
+      "difficulty": 3
     },
     {
-      "id": "q09_temp_conv",
+      "id": "q08_fstring",
       "type": "output",
-      "title": "温度转换",
-      "instruction": "编写代码，将摄氏温度 `c = 100` 转换为华氏温度。\n\n公式：F = C × 9/5 + 32\n\n打印转换后的华氏温度，保留1位小数。",
-      "initialCode": "c = 100\n# 在下方编写代码\n",
+      "title": "格式化输出",
+      "skill": "格式化输出",
+      "instruction": "使用 f-string 输出：`我的年龄是 18 岁`（数字18用变量表示）",
+      "initialCode": "age = 18\n# 在下方编写代码\n",
+      "testCases": [
+        { "name": "基础测试", "expected": "我的年龄是 18 岁", "weight": 0.7 },
+        { "name": "边界测试-不同年龄", "input": "age = 25\nprint(f'我的年龄是 {age} 岁')", "expected": "我的年龄是 25 岁", "isHidden": true, "weight": 0.3 }
+      ],
       "testConfig": {
-        "expected": "212.0",
+        "expected": "我的年龄是 18 岁",
         "timeout_ms": 5000
       },
       "hints": [
-        { "text": "直接套用公式计算", "visible": true }
-      ]
+        { "text": "f'我的年龄是 {age} 岁'", "visible": true }
+      ],
+      "difficulty": 2
     },
     {
-      "id": "q10_time_conv",
+      "id": "q09_time_convert",
       "type": "output",
       "title": "时间转换",
-      "instruction": "已知总秒数 `total_seconds = 3723`，将其转换为\"X小时Y分钟Z秒\"的格式并打印。\n\n例如：3723秒 = 1小时2分钟3秒",
+      "skill": "综合应用",
+      "instruction": "将总秒数 `3723` 转换为 \"X小时Y分钟Z秒\" 格式并打印",
       "initialCode": "total_seconds = 3723\n# 在下方编写代码\n",
+      "testCases": [
+        { "name": "基础测试", "expected": "1小时2分钟3秒", "weight": 0.5 },
+        { "name": "边界测试-仅秒", "input": "total_seconds = 45\nprint(f'{total_seconds}秒')", "expected": "45秒", "isHidden": true, "weight": 0.25 },
+        { "name": "边界测试-仅分钟", "input": "total_seconds = 180\nprint('3分钟')", "expected": "3分钟", "isHidden": true, "weight": 0.25 }
+      ],
       "testConfig": {
-        "expected": "1:2:3",
+        "expected": "1小时2分钟3秒",
         "timeout_ms": 5000
       },
       "hints": [
         { "text": "小时 = total_seconds // 3600", "visible": true },
         { "text": "分钟 = (total_seconds % 3600) // 60", "visible": false }
-      ]
+      ],
+      "difficulty": 3
     },
     {
-      "id": "q11_string_ops",
-      "type": "output",
-      "title": "字符串运算",
-      "instruction": "已知字符串 `s = 'Python'`，打印：\n1. 字符串长度\n2. 首字母（大写）\n3. 末字母（小写）",
-      "initialCode": "s = 'Python'\n# 在下方编写代码\n",
-      "testConfig": {
-        "expected": "6\nP\nn",
-        "timeout_ms": 5000
-      },
-      "hints": [
-        { "text": "len(s) 获取长度", "visible": true },
-        { "text": "s[0] 获取首字符", "visible": false }
-      ]
-    },
-    {
-      "id": "q12_fstring_calc",
-      "type": "output",
-      "title": "格式化输出计算结果",
-      "instruction": "计算 `157 / 3`（保留2位小数），然后用 f-string 输出：`商是 XX.XX`",
-      "initialCode": "# 在下方编写代码\n",
-      "testConfig": {
-        "expected": "商是 52.33",
-        "timeout_ms": 5000
-      },
-      "hints": [
-        { "text": "f-string: f'商是 {result:.2f}'", "visible": true }
-      ]
-    },
-    {
-      "id": "q13_triangle",
-      "type": "output",
-      "title": "三角形面积",
-      "instruction": "计算三角形面积，已知底边 `base = 10`，高 `height = 5`。\n\n公式：面积 = 底 × 高 ÷ 2\n\n打印面积。",
-      "initialCode": "base = 10\nheight = 5\n# 在下方编写代码\n",
-      "testConfig": {
-        "expected": "25.0",
-        "timeout_ms": 5000
-      },
-      "hints": [
-        { "text": "套用面积公式", "visible": true }
-      ]
-    },
-    {
-      "id": "q14_distance",
-      "type": "output",
-      "title": "两点距离公式",
-      "instruction": "已知平面上两点 A(3, 4) 和 B(0, 0)，计算它们之间的欧几里得距离。\n\n公式：距离 = √((x2-x1)² + (y2-y1)²)\n\n打印距离，保留2位小数。\n\n提示：使用 math.sqrt()",
-      "initialCode": "# 在下方编写代码\n",
-      "testConfig": {
-        "expected": "5.0",
-        "timeout_ms": 5000
-      },
-      "hints": [
-        { "text": "代入公式：(3**2 + 4**2)**0.5", "visible": true }
-      ]
-    },
-    {
-      "id": "q15_bmi",
+      "id": "q10_bmi",
       "type": "output",
       "title": "BMI计算",
-      "instruction": "计算 BMI 指数。已知体重 `weight = 70` kg，身高 `height = 1.75` m。\n\n公式：BMI = 体重(kg) / 身高(m)²\n\n打印 BMI 值，保留1位小数。",
+      "skill": "综合应用",
+      "instruction": "计算 BMI 指数。已知体重 70kg，身高 1.75m。公式：BMI = 体重 / 身高²。打印结果保留1位小数。",
       "initialCode": "weight = 70\nheight = 1.75\n# 在下方编写代码\n",
+      "testCases": [
+        { "name": "基础测试", "expected": "22.9", "weight": 0.5 },
+        { "name": "边界测试-正常BMI", "input": "weight = 60\nheight = 1.7\n# 计算BMI", "expected": "20.8", "isHidden": true, "weight": 0.25 },
+        { "name": "边界测试-高BMI", "input": "weight = 100\nheight = 1.6\n# 计算BMI", "expected": "39.1", "isHidden": true, "weight": 0.25 }
+      ],
       "testConfig": {
         "expected": "22.9",
         "timeout_ms": 5000
       },
       "hints": [
-        { "text": "BMI = weight / (height ** 2)", "visible": true }
-      ]
+        { "text": "BMI = weight / (height ** 2)", "visible": true },
+        { "text": "使用 round() 或 f-string 保留小数", "visible": false }
+      ],
+      "difficulty": 3
     }
   ]
 }

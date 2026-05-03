@@ -1,94 +1,48 @@
 {
-  "id": "ch09_exception",
-  "title": "第九章测验：异常处理",
-  "description": "测试 try-except 异常捕获和处理",
-  "duration": 20,
-  "totalScore": 100,
-  "passingScore": 60,
+  "title": "第九章异常处理",
+  "description": "掌握异常处理和自定义异常",
   "questions": [
     {
-      "id": "ex9_q1",
-      "type": "output",
-      "title": "基本异常捕获",
-      "instruction": "尝试执行 1/0，捕获 ZeroDivisionError，打印 'Error: division by zero'。\n\n期望输出：Error: division by zero",
-      "initialCode": "try:\n    result = 1 / 0\nexcept ZeroDivisionError:\n    print('Error: division by zero')\n",
-      "testConfig": {
-        "expected": "Error: division by zero",
-        "timeout_ms": 5000
-      },
-      "hints": [
-        { "text": "基本 try-except 结构", "visible": false }
-      ]
+      "id": 1,
+      "type": "code",
+      "question": "尝试将字符串 'abc' 转换为整数，并捕获 ValueError。如果发生异常，打印 'Cannot convert string to integer'。",
+      "initialCode": "try:\n    value = int('abc')\nexcept ValueError as e:\n    # 在这里添加代码\n    pass",
+      "expected": "Cannot convert string to integer"
     },
     {
-      "id": "ex9_q2",
-      "type": "output",
-      "title": "ValueError捕获",
-      "instruction": "尝试将 'abc' 转为整数，捕获 ValueError，打印 'Invalid number'。\n\n期望输出：Invalid number",
-      "initialCode": "try:\n    num = int('abc')\nexcept ValueError:\n    print('Invalid number')\n",
-      "testConfig": {
-        "expected": "Invalid number",
-        "timeout_ms": 5000
-      },
-      "hints": [
-        { "text": "int() 对非数字字符串抛出 ValueError", "visible": false }
-      ]
+      "id": 2,
+      "type": "code",
+      "question": "计算 10 / 0 并捕获 ZeroDivisionError。如果发生异常，打印 'Cannot divide by zero'。",
+      "initialCode": "try:\n    result = 10 / 0\nexcept ZeroDivisionError as e:\n    # 在这里添加代码\n    pass",
+      "expected": "Cannot divide by zero"
     },
     {
-      "id": "ex9_q3",
-      "type": "output",
-      "title": "捕获异常对象",
-      "instruction": "捕获 ValueError 并打印错误信息（使用 as）。",
-      "initialCode": "try:\n    num = int('xyz')\nexcept ValueError as e:\n    print(e)\n",
-      "testConfig": {
-        "expected": "invalid literal for int() with base 10: 'xyz'",
-        "timeout_ms": 5000
-      },
-      "hints": [
-        { "text": "except ValueError as e:", "visible": false }
-      ]
+      "id": 3,
+      "type": "code",
+      "question": "访问不存在的字典键，并捕获 KeyError。如果发生异常，打印 'Key not found'。",
+      "initialCode": "try:\n    d = {'name': 'Bob'}\n    value = d['age']\nexcept KeyError as e:\n    # 在这里添加代码\n    pass",
+      "expected": "Key not found"
     },
     {
-      "id": "ex9_q4",
-      "type": "output",
-      "title": "else子句",
-      "instruction": "try-except-else 结构，如果没有异常则打印 'Success'。\n\n期望输出：Success",
-      "initialCode": "try:\n    x = 10\nexcept:\n    print('Error')\nelse:\n    print('Success')\n",
-      "testConfig": {
-        "expected": "Success",
-        "timeout_ms": 5000
-      },
-      "hints": [
-        { "text": "else 在 try 块没有异常时执行", "visible": false }
-      ]
+      "id": 4,
+      "type": "code",
+      "question": "尝试打开不存在的文件，并捕获 FileNotFoundError。如果发生异常，打印 'File not found'。",
+      "initialCode": "try:\n    f = open('non_existent_file.txt', 'r')\nexcept FileNotFoundError as e:\n    # 在这里添加代码\n    pass",
+      "expected": "File not found"
     },
     {
-      "id": "ex9_q5",
-      "type": "output",
-      "title": "finally子句",
-      "instruction": "try-except-finally 结构，无论是否有异常都打印 'Done'。\n\n期望输出：Done",
-      "initialCode": "try:\n    x = 1\nexcept:\n    print('Error')\nfinally:\n    print('Done')\n",
-      "testConfig": {
-        "expected": "Done",
-        "timeout_ms": 5000
-      },
-      "hints": [
-        { "text": "finally 块总是执行", "visible": false }
-      ]
+      "id": 5,
+      "type": "code",
+      "question": "调用不存在的函数，并捕获 NameError。如果发生异常，打印 'Function not found'。",
+      "initialCode": "try:\n    nonexistent_function()\nexcept NameError as e:\n    # 在这里添加代码\n    pass",
+      "expected": "Function not found"
     },
     {
-      "id": "ex9_q6",
-      "type": "output",
-      "title": "手动抛出异常",
-      "instruction": "手动抛出 ValueError，消息为 'Invalid value'。\n\n期望输出：Invalid value",
-      "initialCode": "raise ValueError('Invalid value')\n",
-      "testConfig": {
-        "expected": "Invalid value",
-        "timeout_ms": 5000
-      },
-      "hints": [
-        { "text": "raise ValueError('message')", "visible": false }
-      ]
+      "id": 6,
+      "type": "code",
+      "question": "如果 age < 0 或 age > 120，抛出 ValueError('Invalid age')。否则打印 'Valid age'。",
+      "initialCode": "age = 25\nif age < 0 or age > 120:\n    raise ValueError('Invalid age')\nelse:\n    print('Valid age')",
+      "expected": "Valid age"
     }
   ]
 }

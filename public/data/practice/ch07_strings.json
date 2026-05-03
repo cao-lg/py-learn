@@ -1,26 +1,30 @@
 {
   "id": "ch07_strings",
-  "title": "Python 基础 - 第七章：字符串处理",
-  "description": "学习字符串的常用操作和方法",
+  "title": "第七章：字符串处理",
+  "description": "掌握字符串的常用操作和方法",
+  "skillPoints": ["字符串索引", "字符串切片", "大小写转换", "空白处理", "查找替换", "分割连接", "f-string格式化"],
   "questions": [
     {
       "id": "str01_index",
       "type": "output",
       "title": "字符串索引",
-      "instruction": "字符串 `s = 'Hello'` ，打印第一个字符。",
+      "skill": "字符串索引",
+      "instruction": "字符串 `s = 'Hello'`，打印第一个字符。",
       "initialCode": "s = 'Hello'\n# 在下方编写代码\n",
       "testConfig": {
         "expected": "H",
         "timeout_ms": 5000
       },
       "hints": [
-        { "text": "s[0]", "visible": false }
-      ]
+        { "text": "s[0]", "visible": true }
+      ],
+      "difficulty": 1
     },
     {
       "id": "str02_slice",
       "type": "output",
       "title": "字符串切片",
+      "skill": "字符串切片",
       "instruction": "字符串 `s = 'Hello World'`，切片获取 'World'。",
       "initialCode": "s = 'Hello World'\n# 在下方编写代码\n",
       "testConfig": {
@@ -28,27 +32,31 @@
         "timeout_ms": 5000
       },
       "hints": [
-        { "text": "s[6:]", "visible": false }
-      ]
+        { "text": "s[6:]", "visible": true }
+      ],
+      "difficulty": 1
     },
     {
       "id": "str03_upper_lower",
       "type": "output",
       "title": "大小写转换",
-      "instruction": "字符串 `s = 'Hello'` ，全部转为大写后打印。",
+      "skill": "大小写转换",
+      "instruction": "字符串 `s = 'Hello'`，全部转为大写后打印。",
       "initialCode": "s = 'Hello'\n# 在下方编写代码\n",
       "testConfig": {
         "expected": "HELLO",
         "timeout_ms": 5000
       },
       "hints": [
-        { "text": "s.upper()", "visible": false }
-      ]
+        { "text": "s.upper()", "visible": true }
+      ],
+      "difficulty": 1
     },
     {
       "id": "str04_strip",
       "type": "output",
       "title": "去除空白",
+      "skill": "空白处理",
       "instruction": "字符串 `s = '  hello  '`，去除两端空白后打印。",
       "initialCode": "s = '  hello  '\n# 在下方编写代码\n",
       "testConfig": {
@@ -56,27 +64,31 @@
         "timeout_ms": 5000
       },
       "hints": [
-        { "text": "s.strip()", "visible": false }
-      ]
+        { "text": "s.strip()", "visible": true }
+      ],
+      "difficulty": 1
     },
     {
       "id": "str05_split",
       "type": "output",
       "title": "字符串分割",
-      "instruction": "字符串 `s = 'apple,banana,orange'` ，按逗号分割成列表。",
+      "skill": "分割连接",
+      "instruction": "字符串 `s = 'apple,banana,orange'`，按逗号分割成列表。",
       "initialCode": "s = 'apple,banana,orange'\n# 在下方编写代码\n",
       "testConfig": {
         "expected": "['apple', 'banana', 'orange']",
         "timeout_ms": 5000
       },
       "hints": [
-        { "text": "s.split(',')", "visible": false }
-      ]
+        { "text": "s.split(',')", "visible": true }
+      ],
+      "difficulty": 1
     },
     {
       "id": "str06_join",
       "type": "output",
       "title": "字符串连接",
+      "skill": "分割连接",
       "instruction": "列表 `words = ['Hello', 'World']`，用空格连接成字符串。",
       "initialCode": "words = ['Hello', 'World']\n# 在下方编写代码\n",
       "testConfig": {
@@ -84,55 +96,47 @@
         "timeout_ms": 5000
       },
       "hints": [
-        { "text": "' '.join(words)", "visible": false }
-      ]
+        { "text": \"' '.join(words)\", "visible": true }
+      ],
+      "difficulty": 1
     },
     {
       "id": "str07_replace",
       "type": "output",
       "title": "字符串替换",
-      "instruction": "字符串 `s = 'Hello World'` ，将 'World' 替换为 'Python'。",
+      "skill": "查找替换",
+      "instruction": "字符串 `s = 'Hello World'`，将 'World' 替换为 'Python'。",
       "initialCode": "s = 'Hello World'\n# 在下方编写代码\n",
       "testConfig": {
         "expected": "Hello Python",
         "timeout_ms": 5000
       },
       "hints": [
-        { "text": "s.replace('World', 'Python')", "visible": false }
-      ]
+        { "text": \"s.replace('World', 'Python')\", "visible": true }
+      ],
+      "difficulty": 1
     },
     {
-      "id": "str08_find",
-      "type": "output",
-      "title": "查找子串",
-      "instruction": "字符串 `s = 'Hello World'` ，查找 'World' 的起始位置（索引）。",
-      "initialCode": "s = 'Hello World'\n# 在下方编写代码\n",
-      "testConfig": {
-        "expected": "6",
-        "timeout_ms": 5000
-      },
-      "hints": [
-        { "text": "s.find('World')", "visible": false }
-      ]
-    },
-    {
-      "id": "str09_count",
+      "id": "str08_count",
       "type": "output",
       "title": "计数",
-      "instruction": "字符串 `s = 'hello world'` ，统计字符 'l' 出现的次数。",
+      "skill": "查找替换",
+      "instruction": "字符串 `s = 'hello world'`，统计字符 'l' 出现的次数。",
       "initialCode": "s = 'hello world'\n# 在下方编写代码\n",
       "testConfig": {
         "expected": "3",
         "timeout_ms": 5000
       },
       "hints": [
-        { "text": "s.count('l')", "visible": false }
-      ]
+        { "text": "s.count('l')", "visible": true }
+      ],
+      "difficulty": 1
     },
     {
-      "id": "str10_fstring",
+      "id": "str09_fstring",
       "type": "output",
       "title": "f-string格式化",
+      "skill": "f-string格式化",
       "instruction": "变量 `name = 'Alice'` 和 `age = 20`，用 f-string 打印 `Alice is 20 years old`。",
       "initialCode": "name = 'Alice'\nage = 20\n# 在下方编写代码\n",
       "testConfig": {
@@ -140,78 +144,57 @@
         "timeout_ms": 5000
       },
       "hints": [
-        { "text": "f\"{name} is {age} years old\"", "visible": false }
-      ]
+        { "text": \"f\\\"{name} is {age} years old\\\"\", "visible": true }
+      ],
+      "difficulty": 2
     },
     {
-      "id": "str11_reverse",
+      "id": "str10_reverse",
       "type": "output",
       "title": "字符串反转",
-      "instruction": "字符串 `s = 'Python'` ，反转后打印。",
+      "skill": "字符串切片",
+      "instruction": "字符串 `s = 'Python'`，反转后打印。",
       "initialCode": "s = 'Python'\n# 在下方编写代码\n",
       "testConfig": {
         "expected": "nohtyP",
         "timeout_ms": 5000
       },
       "hints": [
-        { "text": "s[::-1]", "visible": false }
-      ]
+        { "text": "s[::-1]", "visible": true }
+      ],
+      "difficulty": 2
     },
     {
-      "id": "str12_isdigit",
+      "id": "str11_isdigit",
       "type": "output",
       "title": "判断数字",
-      "instruction": "字符串 `s = '12345'` ，判断是否全是数字，打印 True 或 False。",
+      "skill": "字符串判断",
+      "instruction": "字符串 `s = '12345'`，判断是否全是数字，打印 True 或 False。",
       "initialCode": "s = '12345'\n# 在下方编写代码\n",
       "testConfig": {
         "expected": "True",
         "timeout_ms": 5000
       },
       "hints": [
-        { "text": "s.isdigit()", "visible": false }
-      ]
+        { "text": "s.isdigit()", "visible": true }
+      ],
+      "difficulty": 1
     },
     {
-      "id": "str13_startswith",
-      "type": "output",
-      "title": "判断开头",
-      "instruction": "字符串 `s = 'Hello World'` ，判断是否以 'Hello' 开头。",
-      "initialCode": "s = 'Hello World'\n# 在下方编写代码\n",
-      "testConfig": {
-        "expected": "True",
-        "timeout_ms": 5000
-      },
-      "hints": [
-        { "text": "s.startswith('Hello')", "visible": false }
-      ]
-    },
-    {
-      "id": "str14_title",
+      "id": "str12_title",
       "type": "output",
       "title": "首字母大写",
-      "instruction": "字符串 `s = 'hello world'` ，每个词首字母大写后打印。",
+      "skill": "大小写转换",
+      "instruction": "字符串 `s = 'hello world'`，每个词首字母大写后打印。",
       "initialCode": "s = 'hello world'\n# 在下方编写代码\n",
       "testConfig": {
         "expected": "Hello World",
         "timeout_ms": 5000
       },
       "hints": [
-        { "text": "s.title()", "visible": false }
-      ]
-    },
-    {
-      "id": "str15_format",
-      "type": "output",
-      "title": "format方法",
-      "instruction": "用 format() 方法打印 'Hello, Alice!'（使用位置占位符）。",
-      "initialCode": "# 在下方编写代码\n",
-      "testConfig": {
-        "expected": "Hello, Alice!",
-        "timeout_ms": 5000
-      },
-      "hints": [
-        { "text": "'Hello, {}!'.format('Alice')", "visible": false }
-      ]
+        { "text": "s.title()", "visible": true }
+      ],
+      "difficulty": 1
     }
   ]
 }

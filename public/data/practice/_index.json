@@ -2,53 +2,73 @@
   "chapters": [
     {
       "id": "ch01_basics",
-      "title": "第一章：Python 简介",
-      "questionCount": 10
+      "title": "第一章：Python 基础",
+      "questionCount": 10,
+      "skills": ["print()函数", "字符串表示", "数学运算", "运算优先级", "格式化输出"],
+      "difficulty": 1
     },
     {
       "id": "ch02_variables",
       "title": "第二章：变量和数据类型",
-      "questionCount": 15
+      "questionCount": 12,
+      "skills": ["变量赋值", "数据类型", "类型转换", "字符串操作", "列表基础"],
+      "difficulty": 2
     },
     {
       "id": "ch03_operators",
       "title": "第三章：运算符",
-      "questionCount": 20
+      "questionCount": 12,
+      "skills": ["算术运算", "比较运算", "逻辑运算", "位运算", "赋值运算"],
+      "difficulty": 2
     },
     {
       "id": "ch04_control_flow",
       "title": "第四章：控制流",
-      "questionCount": 16
+      "questionCount": 10,
+      "skills": ["if语句", "for循环", "while循环", "break/continue", "条件表达式"],
+      "difficulty": 3
     },
     {
       "id": "ch05_functions",
       "title": "第五章：函数",
-      "questionCount": 17
+      "questionCount": 10,
+      "skills": ["函数定义", "参数传递", "返回值", "lambda表达式", "递归"],
+      "difficulty": 3
     },
     {
       "id": "ch06_data_structures",
       "title": "第六章：数据结构",
-      "questionCount": 20
+      "questionCount": 12,
+      "skills": ["列表操作", "字典操作", "元组", "集合", "推导式"],
+      "difficulty": 3
     },
     {
       "id": "ch07_strings",
       "title": "第七章：字符串处理",
-      "questionCount": 15
+      "questionCount": 10,
+      "skills": ["字符串方法", "切片", "格式化", "编码", "正则表达式"],
+      "difficulty": 2
     },
     {
       "id": "ch08_file_io",
       "title": "第八章：文件操作",
-      "questionCount": 12
+      "questionCount": 8,
+      "skills": ["文件读写", "上下文管理器", "JSON处理", "CSV处理"],
+      "difficulty": 3
     },
     {
       "id": "ch09_exception",
       "title": "第九章：异常处理",
-      "questionCount": 12
+      "questionCount": 8,
+      "skills": ["try-except", "异常类型", "自定义异常", "finally"],
+      "difficulty": 3
     },
     {
       "id": "ch10_oop",
       "title": "第十章：面向对象编程",
-      "questionCount": 15
+      "questionCount": 10,
+      "skills": ["类定义", "继承", "封装", "多态", "魔术方法"],
+      "difficulty": 4
     }
   ]
 }

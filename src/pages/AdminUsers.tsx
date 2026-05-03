@@ -1,54 +1,51 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { AdminLayout } from '../components/AdminLayout';
+import { uumsClient } from '../utils/uums-api';
 
 interface User {
-  id: string;
-  name: string;
-  createdAt: number;
-  updatedAt: number;
+  id: number;
+  username: string;
+  nickname: string;
+  role: string;
+  school_name?: string;
+  class_name?: string;
+  status: string;
 }
-
-const ADMIN_PASSWORD = '__admin__admin123';
 
 export function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState<'name' | 'createdAt'>('createdAt');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [sortBy, setSortBy] = useState<'username' | 'role'>('username');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
   useEffect(() => {
     loadUsers();
   }, []);
 
   useEffect(() => {
-    // 筛选和排序用户
     let result = [...users];
 
-    // 搜索
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       result = result.filter(
-        (user) => 
-          user.name.toLowerCase().includes(query) || 
-          user.id.toLowerCase().includes(query)
+        (user) =>
+          user.username.toLowerCase().includes(query) ||
+          String(user.id).includes(query)
       );
     }
 
-    // 排序
     result.sort((a, b) => {
-      if (sortBy === 'name') {
-        return sortOrder === 'asc' 
-          ? a.name.localeCompare(b.name) 
-          : b.name.localeCompare(a.name);
+      if (sortBy === 'username') {
+        return sortOrder === 'asc'
+          ? a.username.localeCompare(b.username)
+          : b.username.localeCompare(a.username);
       } else {
-        return sortOrder === 'asc' 
-          ? a.createdAt - b.createdAt 
-          : b.createdAt - a.createdAt;
+        return sortOrder === 'asc'
+          ? a.role.localeCompare(b.role)
+          : b.role.localeCompare(a.role);
       }
     });
 
@@ -58,89 +55,17 @@ export function AdminUsersPage() {
   const loadUsers = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/users-management', {
-        headers: { 'X-Admin-Password': ADMIN_PASSWORD }
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        if (data.ok) {
-          setUsers(data.users || []);
-        } else {
-          setError(data.error || 'Failed to load users');
-        }
+      const result = await uumsClient.getSiteUsers();
+
+      if (result && result.code === 200) {
+        setUsers(result.data || []);
       } else {
-        setError('Failed to connect to API');
+        setError('获取用户列表失败');
       }
     } catch (err) {
-      setError('Failed to connect to API');
+      setError('获取用户列表失败');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleResetPassword = async (userId: string) => {
-    if (window.confirm('确定要重置此用户的密码吗？系统将生成临时密码。')) {
-      try {
-        const response = await fetch('/api/users-management', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Admin-Password': ADMIN_PASSWORD
-          },
-          body: JSON.stringify({ userId, action: 'resetPassword' }),
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          if (data.ok) {
-            setMessage({ 
-              type: 'success', 
-              text: `密码重置成功！临时密码：${data.tempPassword}\n请将此密码告知用户` 
-            });
-          } else {
-            setMessage({ type: 'error', text: '密码重置失败' });
-          }
-        } else {
-          setMessage({ type: 'error', text: '密码重置失败' });
-        }
-      } catch (error) {
-        setMessage({ type: 'error', text: '密码重置失败' });
-      } finally {
-        setTimeout(() => setMessage(null), 5000);
-      }
-    }
-  };
-
-  const handleDeleteUser = async (userId: string) => {
-    if (window.confirm('确定要删除此用户吗？此操作将删除用户的所有数据，且无法恢复。')) {
-      try {
-        const response = await fetch('/api/users-management', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Admin-Password': ADMIN_PASSWORD
-          },
-          body: JSON.stringify({ userId, action: 'delete' }),
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          if (data.ok) {
-            setMessage({ type: 'success', text: '用户删除成功' });
-            // 重新加载用户列表
-            loadUsers();
-          } else {
-            setMessage({ type: 'error', text: '用户删除失败' });
-          }
-        } else {
-          setMessage({ type: 'error', text: '用户删除失败' });
-        }
-      } catch (error) {
-        setMessage({ type: 'error', text: '用户删除失败' });
-      } finally {
-        setTimeout(() => setMessage(null), 3000);
-      }
     }
   };
 
@@ -169,17 +94,6 @@ export function AdminUsersPage() {
 
   return (
     <AdminLayout title="用户管理">
-      {message && (
-        <div className={`mb-6 p-4 rounded-lg ${
-          message.type === 'success' 
-            ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
-            : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-        }`}>
-          {message.text}
-        </div>
-      )}
-
-      {/* 搜索和筛选区域 */}
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700 mb-6">
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex-1 min-w-[200px]">
@@ -199,11 +113,11 @@ export function AdminUsersPage() {
             <span className="text-sm text-gray-500 dark:text-gray-400">排序:</span>
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as 'name' | 'createdAt')}
+              onChange={(e) => setSortBy(e.target.value as 'username' | 'role')}
               className="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             >
-              <option value="name">名称</option>
-              <option value="createdAt">创建时间</option>
+              <option value="username">用户名</option>
+              <option value="role">角色</option>
             </select>
 
             <button
@@ -224,7 +138,6 @@ export function AdminUsersPage() {
         </div>
       </div>
 
-      {/* 用户统计 */}
       <div className="grid md:grid-cols-3 gap-6 mb-6">
         <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg border border-gray-200 dark:border-gray-700">
           <h3 className="text-sm text-gray-500 dark:text-gray-400 mb-1">总用户数</h3>
@@ -236,7 +149,6 @@ export function AdminUsersPage() {
         </div>
       </div>
 
-      {/* 用户列表 */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -246,16 +158,22 @@ export function AdminUsersPage() {
                   用户ID
                 </th>
                 <th className="px-6 py-4 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
-                  姓名
+                  用户名
                 </th>
                 <th className="px-6 py-4 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
-                  创建时间
+                  昵称
                 </th>
                 <th className="px-6 py-4 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
-                  更新时间
+                  角色
                 </th>
                 <th className="px-6 py-4 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
-                  操作
+                  学校
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
+                  班级
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
+                  状态
                 </th>
               </tr>
             </thead>
@@ -263,46 +181,40 @@ export function AdminUsersPage() {
               {filteredUsers.map((user) => (
                 <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors">
                   <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 font-mono">
-                    {user.id.slice(0, 8)}...
+                    {user.id}
                   </td>
                   <td className="px-6 py-4 text-sm font-medium">
-                    <Link to={`/admin/users/${user.id}`} className="text-blue-600 dark:text-blue-400 hover:underline">
-                      {user.name}
-                    </Link>
+                    {user.username}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
-                    {new Date(user.createdAt).toLocaleString('zh-CN')}
+                    {user.nickname || '-'}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
-                    {new Date(user.updatedAt).toLocaleString('zh-CN')}
+                    {user.role}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                    {user.school_name || '-'}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                    {user.class_name || '-'}
                   </td>
                   <td className="px-6 py-4 text-sm">
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleResetPassword(user.id)}
-                        className="px-3 py-1.5 text-sm bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors"
-                      >
-                        重置密码
-                      </button>
-                      <button
-                        onClick={() => handleDeleteUser(user.id)}
-                        className="px-3 py-1.5 text-sm bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
-                      >
-                        删除
-                      </button>
-                    </div>
+                    <span className={`px-2 py-1 rounded-full text-xs ${
+                      user.status === 'active'
+                        ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                        : 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400'
+                    }`}>
+                      {user.status === 'active' ? '正常' : '禁用'}
+                    </span>
                   </td>
                 </tr>
               ))}
               {filteredUsers.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
+                  <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
                     <div className="flex flex-col items-center">
                       <span className="text-4xl mb-2">👥</span>
                       <p className="mb-1">{users.length === 0 ? '暂无用户数据' : '没有匹配的用户'}</p>
-                      <p className="text-sm text-gray-400">
-                        {users.length === 0 ? '用户注册后会显示在这里' : '请尝试其他搜索条件'}
-                      </p>
                     </div>
                   </td>
                 </tr>

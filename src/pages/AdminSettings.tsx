@@ -1,16 +1,22 @@
 import { useState, useEffect } from 'react';
 import { AdminLayout } from '../components/AdminLayout';
+import { API_BASE } from '../utils/uums-api';
 
 interface ExamInfo {
-  id: string;
+  id?: string;
+  exam_id?: string;
   title: string;
   description: string;
   duration: number;
-  totalScore: number;
-  questionCount: number;
+  totalScore?: number;
+  total_score?: number;
+  questionCount?: number;
+  question_count?: number;
   difficulty: string;
   startTime?: string;
   endTime?: string;
+  start_time?: string;
+  end_time?: string;
 }
 
 interface ExamSchedule {
@@ -18,7 +24,13 @@ interface ExamSchedule {
   endTime: string | null;
 }
 
-const ADMIN_PASSWORD = '__admin__admin123';
+function getAuthHeaders(): Record<string, string> {
+  const token = localStorage.getItem('adminToken');
+  if (token) {
+    return { 'Authorization': `Bearer ${token}` };
+  }
+  return {} as Record<string, string>;
+}
 
 export function AdminSettingsPage() {
   const [exams, setExams] = useState<ExamInfo[]>([]);
@@ -33,22 +45,54 @@ export function AdminSettingsPage() {
 
   const loadData = async () => {
     try {
-      const [examRes, scheduleRes] = await Promise.all([
-        fetch('/data/exam/_index.json'),
-        fetch('/api/exam-schedule', {
-          headers: { 'X-Admin-Password': ADMIN_PASSWORD }
-        })
-      ]);
-
-      const examData = await examRes.json();
-      setExams(examData.exams);
+      // 从后端API获取考试列表和时间安排
+      const scheduleRes = await fetch(`${API_BASE}/exam-schedule`, {
+        headers: getAuthHeaders()
+      });
 
       if (scheduleRes.ok) {
         const scheduleData = await scheduleRes.json();
-        setSchedule(scheduleData.schedule || {});
+        
+        if (scheduleData.code === 200 && scheduleData.data) {
+          // 转换数据格式以适配前端
+          const examList: ExamInfo[] = scheduleData.data.map((exam: any) => ({
+            id: exam.exam_id,
+            exam_id: exam.exam_id,
+            title: exam.title,
+            description: exam.description || '',
+            duration: exam.duration || 60,
+            totalScore: exam.total_score || 100,
+            questionCount: exam.question_count || 10,
+            difficulty: exam.difficulty || 'medium',
+            startTime: exam.start_time,
+            endTime: exam.end_time
+          }));
+          
+          setExams(examList);
+          
+          // 构建schedule映射
+          const scheduleMap: Record<string, ExamSchedule> = {};
+          scheduleData.data.forEach((exam: any) => {
+            if (exam.start_time || exam.end_time) {
+              scheduleMap[exam.exam_id] = {
+                startTime: exam.start_time,
+                endTime: exam.end_time
+              };
+            }
+          });
+          setSchedule(scheduleMap);
+        }
       }
     } catch (error) {
       console.error('Failed to load data:', error);
+      // 尝试从本地JSON加载
+      try {
+        const examRes = await fetch('/data/exam/_index.json');
+        const examData = await examRes.json();
+        setExams(examData.exams);
+      } catch (localError) {
+        console.error('Failed to load local exam data:', localError);
+      }
     } finally {
       setLoading(false);
     }
@@ -59,23 +103,36 @@ export function AdminSettingsPage() {
     setMessage(null);
 
     try {
-      const response = await fetch('/api/exam-schedule', {
+      const exam = exams.find(e => (e.id || e.exam_id) === examId);
+      const response = await fetch(`${API_BASE}/exam-schedule`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-Admin-Password': ADMIN_PASSWORD
+          ...getAuthHeaders()
         },
-        body: JSON.stringify({ examId, startTime, endTime }),
+        body: JSON.stringify({
+          examId,
+          title: exam?.title || examId,
+          description: exam?.description || '',
+          duration: exam?.duration || 60,
+          totalScore: exam?.totalScore || exam?.total_score || 100,
+          questionCount: exam?.questionCount || exam?.question_count || 10,
+          difficulty: exam?.difficulty || 'medium',
+          startTime,
+          endTime
+        }),
       });
 
-      if (response.ok) {
+      const result = await response.json();
+      
+      if (result.code === 200 || result.code === 201) {
         setSchedule(prev => ({
           ...prev,
           [examId]: { startTime: startTime || null, endTime: endTime || null }
         }));
-        setMessage({ type: 'success', text: `${exams.find(e => e.id === examId)?.title || '考试'}设置已保存` });
+        setMessage({ type: 'success', text: `${exams.find(e => (e.id || e.exam_id) === examId)?.title || '考试'}设置已保存` });
       } else {
-        setMessage({ type: 'error', text: '保存失败' });
+        setMessage({ type: 'error', text: result.message || '保存失败' });
       }
     } catch (error) {
       setMessage({ type: 'error', text: '保存失败' });
@@ -128,6 +185,7 @@ export function AdminSettingsPage() {
 
       <div className="space-y-6">
         {exams.map((exam) => {
+          if (!exam.id) return null;
           const examSchedule = schedule[exam.id];
           const startInputId = `start-${exam.id}`;
           const endInputId = `end-${exam.id}`;
@@ -253,7 +311,7 @@ export function AdminSettingsPage() {
                     const endInput = document.getElementById(endInputId) as HTMLInputElement;
                     const startTime = startInput?.value ? new Date(startInput.value).toISOString() : '';
                     const endTime = endInput?.value ? new Date(endInput.value).toISOString() : '';
-                    await handleSave(exam.id, startTime, endTime);
+                    await handleSave(exam.id!, startTime, endTime);
                   }}
                   disabled={saving === exam.id}
                   className="px-6 py-3 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
@@ -271,7 +329,7 @@ export function AdminSettingsPage() {
                   )}
                 </button>
                 <button
-                  onClick={() => handleClear(exam.id)}
+                  onClick={() => handleClear(exam.id!)}
                   disabled={saving === exam.id}
                   className="px-6 py-3 text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-gray-600 rounded-lg font-medium hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
                 >

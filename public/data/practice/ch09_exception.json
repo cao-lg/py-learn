@@ -1,12 +1,14 @@
 {
   "id": "ch09_exception",
-  "title": "Python 基础 - 第九章：异常处理",
-  "description": "学习 try-except 异常捕获和处理",
+  "title": "第九章：异常处理",
+  "description": "掌握 try-except 异常捕获和处理",
+  "skillPoints": ["try-except", "异常对象", "else-finally", "常见异常", "raise"],
   "questions": [
     {
       "id": "exc01_basic_try",
       "type": "output",
       "title": "基本try-except",
+      "skill": "try-except",
       "instruction": "尝试执行 `1/0`，捕获 ZeroDivisionError 并打印 'Error: division by zero'。",
       "initialCode": "try:\n    result = 1 / 0\nexcept ZeroDivisionError:\n    print('Error: division by zero')\n",
       "testConfig": {
@@ -14,13 +16,15 @@
         "timeout_ms": 5000
       },
       "hints": [
-        { "text": "基本的 try-except 结构", "visible": false }
-      ]
+        { "text": "基本的 try-except 结构", "visible": true }
+      ],
+      "difficulty": 1
     },
     {
       "id": "exc02_multiple_except",
       "type": "output",
       "title": "多个except",
+      "skill": "try-except",
       "instruction": "尝试将 'abc' 转为整数，捕获 ValueError 并打印 'Invalid number'。",
       "initialCode": "try:\n    num = int('abc')\nexcept ValueError:\n    print('Invalid number')\n",
       "testConfig": {
@@ -28,13 +32,15 @@
         "timeout_ms": 5000
       },
       "hints": [
-        { "text": "int() 对非数字字符串抛出 ValueError", "visible": false }
-      ]
+        { "text": "int() 对非数字字符串抛出 ValueError", "visible": true }
+      ],
+      "difficulty": 1
     },
     {
       "id": "exc03_except_as",
       "type": "output",
       "title": "捕获异常对象",
+      "skill": "异常对象",
       "instruction": "捕获 ValueError 并打印错误信息（使用 as）。",
       "initialCode": "try:\n    num = int('xyz')\nexcept ValueError as e:\n    print(e)\n",
       "testConfig": {
@@ -42,13 +48,15 @@
         "timeout_ms": 5000
       },
       "hints": [
-        { "text": "except ValueError as e:", "visible": false }
-      ]
+        { "text": "except ValueError as e:", "visible": true }
+      ],
+      "difficulty": 1
     },
     {
       "id": "exc04_else_clause",
       "type": "output",
       "title": "else子句",
+      "skill": "else-finally",
       "instruction": "try-except-else 结构，如果没有异常则打印 'Success'。",
       "initialCode": "try:\n    x = 10\nexcept:\n    print('Error')\nelse:\n    print('Success')\n",
       "testConfig": {
@@ -56,13 +64,15 @@
         "timeout_ms": 5000
       },
       "hints": [
-        { "text": "else 在 try 块没有异常时执行", "visible": false }
-      ]
+        { "text": "else 在 try 块没有异常时执行", "visible": true }
+      ],
+      "difficulty": 2
     },
     {
       "id": "exc05_finally",
       "type": "output",
       "title": "finally子句",
+      "skill": "else-finally",
       "instruction": "try-except-finally 结构，无论是否有异常都打印 'Done'。",
       "initialCode": "try:\n    x = 1\nexcept:\n    print('Error')\nfinally:\n    print('Done')\n",
       "testConfig": {
@@ -70,13 +80,15 @@
         "timeout_ms": 5000
       },
       "hints": [
-        { "text": "finally 块总是执行", "visible": false }
-      ]
+        { "text": "finally 块总是执行", "visible": true }
+      ],
+      "difficulty": 2
     },
     {
       "id": "exc06_index_error",
       "type": "output",
       "title": "索引错误",
+      "skill": "常见异常",
       "instruction": "捕获列表的 IndexError，处理后打印 'Out of range'。",
       "initialCode": "try:\n    lst = [1, 2, 3]\n    print(lst[10])\nexcept IndexError:\n    print('Out of range')\n",
       "testConfig": {
@@ -84,13 +96,15 @@
         "timeout_ms": 5000
       },
       "hints": [
-        { "text": "访问不存在的索引会抛出 IndexError", "visible": false }
-      ]
+        { "text": "访问不存在的索引会抛出 IndexError", "visible": true }
+      ],
+      "difficulty": 1
     },
     {
       "id": "exc07_key_error",
       "type": "output",
       "title": "键错误",
+      "skill": "常见异常",
       "instruction": "捕获字典的 KeyError，处理后打印 'Key not found'。",
       "initialCode": "try:\n    d = {'a': 1}\n    print(d['b'])\nexcept KeyError:\n    print('Key not found')\n",
       "testConfig": {
@@ -98,13 +112,15 @@
         "timeout_ms": 5000
       },
       "hints": [
-        { "text": "访问不存在的键会抛出 KeyError", "visible": false }
-      ]
+        { "text": "访问不存在的键会抛出 KeyError", "visible": true }
+      ],
+      "difficulty": 1
     },
     {
       "id": "exc08_raise",
       "type": "output",
       "title": "手动抛出异常",
+      "skill": "raise",
       "instruction": "手动抛出 ValueError，消息为 'Invalid value'。",
       "initialCode": "raise ValueError('Invalid value')\n",
       "testConfig": {
@@ -112,27 +128,15 @@
         "timeout_ms": 5000
       },
       "hints": [
-        { "text": "raise ValueError('message')", "visible": false }
-      ]
+        { "text": "raise ValueError('message')", "visible": true }
+      ],
+      "difficulty": 1
     },
     {
-      "id": "exc09_catch_all",
-      "type": "output",
-      "title": "捕获所有异常",
-      "instruction": "用 except Exception as e 捕获所有异常，打印异常类型名称。",
-      "initialCode": "try:\n    x = 1 / 0\nexcept Exception as e:\n    print(type(e).__name__)\n",
-      "testConfig": {
-        "expected": "ZeroDivisionError",
-        "timeout_ms": 5000
-      },
-      "hints": [
-        { "text": "type(e).__name__ 获取异常类型名", "visible": false }
-      ]
-    },
-    {
-      "id": "exc10_type_error",
+      "id": "exc09_type_error",
       "type": "output",
       "title": "类型错误",
+      "skill": "常见异常",
       "instruction": "捕获 TypeError（尝试int和str相加），打印 'Type mismatch'。",
       "initialCode": "try:\n    result = 1 + 'a'\nexcept TypeError:\n    print('Type mismatch')\n",
       "testConfig": {
@@ -140,13 +144,15 @@
         "timeout_ms": 5000
       },
       "hints": [
-        { "text": "不同类型相加会抛出 TypeError", "visible": false }
-      ]
+        { "text": "不同类型相加会抛出 TypeError", "visible": true }
+      ],
+      "difficulty": 1
     },
     {
-      "id": "exc11_file_not_found",
+      "id": "exc10_file_not_found",
       "type": "output",
       "title": "文件不存在",
+      "skill": "常见异常",
       "instruction": "捕获 FileNotFoundError，打印 'File not found'。",
       "initialCode": "try:\n    open('nonexistent.txt')\nexcept FileNotFoundError:\n    print('File not found')\n",
       "testConfig": {
@@ -154,22 +160,9 @@
         "timeout_ms": 5000
       },
       "hints": [
-        { "text": "打开不存在的文件会抛出 FileNotFoundError", "visible": false }
-      ]
-    },
-    {
-      "id": "exc12_assertion",
-      "type": "output",
-      "title": "断言",
-      "instruction": "使用 assert 语句断言 1 + 1 == 2，如果为真打印 'Correct'。",
-      "initialCode": "assert 1 + 1 == 2\nprint('Correct')\n",
-      "testConfig": {
-        "expected": "Correct",
-        "timeout_ms": 5000
-      },
-      "hints": [
-        { "text": "assert 条件，条件为假时抛出 AssertionError", "visible": false }
-      ]
+        { "text": "打开不存在的文件会抛出 FileNotFoundError", "visible": true }
+      ],
+      "difficulty": 1
     }
   ]
 }

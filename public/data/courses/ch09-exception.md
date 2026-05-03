@@ -1,11 +1,13 @@
 # 异常处理
 
-<div class="intro-card">
-  <h3>📖 章节导学</h3>
-  <p>程序运行中难免出错，异常处理让我们能够优雅地应对错误，而不是让程序崩溃。</p>
+<div className="intro-card">
+  <h3>🎯 学习目标</h3>
+  <p>本章核心目标：掌握 try-except 异常捕获和处理机制。</p>
 </div>
 
-## 基本的 try-except
+---
+
+## 一、基本的 try-except
 
 ```python
 try:
@@ -16,7 +18,9 @@ except ValueError:
     print("错误：值类型不正确！")
 ```
 
-## 捕获异常对象
+---
+
+## 二、捕获异常对象
 
 ```python
 try:
@@ -25,7 +29,9 @@ except ValueError as e:
     print(f"输入错误：{e}")
 ```
 
-## 完整的异常处理结构
+---
+
+## 三、完整的异常处理结构
 
 ```python
 try:
@@ -45,7 +51,9 @@ finally:
     cleanup()
 ```
 
-## 常见的异常类型
+---
+
+## 四、常见的异常类型
 
 | 异常类型 | 说明 |
 |---------|------|
@@ -55,55 +63,31 @@ finally:
 | `IndexError` | 索引超出范围 |
 | `KeyError` | 字典键不存在 |
 | `FileNotFoundError` | 文件不存在 |
-| `AttributeError` | 属性不存在 |
-
-## 自定义异常
-
-```python
-class AgeError(Exception):
-    """年龄异常"""
-    pass
-
-def set_age(age):
-    if age < 0 or age > 150:
-        raise AgeError(f"无效的年龄：{age}")
-    print(f"年龄设置为：{age}")
-
-try:
-    set_age(200)
-except AgeError as e:
-    print(f"捕获到异常：{e}")
-```
-
-## 异常处理的最佳实践
-
-```python
-# ❌ 不推荐的写法（捕获所有异常）
-try:
-    risky_operation()
-except:
-    pass
-
-# ✅ 推荐写法（具体明确）
-try:
-    with open("file.txt", "r") as f:
-        content = f.read()
-except FileNotFoundError:
-    print("文件不存在")
-except PermissionError:
-    print("没有读取权限")
-```
 
 ---
 
-## 📝 随堂练习
+## ✅ 本章核心技能清单
 
-👉 前往 [练习页面](/practice/ch09_exception) 完成以下任务：
-
-1. **除法计算器** - 处理除法运算的零除错误
-2. **类型转换** - 安全地将用户输入转换为整数
-3. **自定义异常** - 创建一个用于验证密码的异常
+| 技能点 | 掌握程度 | 练习建议 |
+|--------|----------|---------|
+| try-except 基本用法 | ★★★ | 必须熟练 |
+| 捕获多个异常 | ★★★ | except 多个类型 |
+| 获取异常信息 | ★★☆ | as e |
+| else/finally 子句 | ★★☆ | 清理资源 |
+| 手动抛出异常 | ★★☆ | raise |
 
 ---
 
-**[下一章预告]** → 面向对象编程：类和对象
+<div className="practice-box">
+## 📝 技能自测
+
+1. try-except 的作用是什么？
+2. else 和 finally 的区别是什么？
+3. 为什么不建议用空 except？
+
+👉 [开始练习](/practice/ch09_exception)
+</div>
+
+---
+
+**[下一章]** → 面向对象编程

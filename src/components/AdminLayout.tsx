@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-
-const ADMIN_PASSWORD = '__admin__admin123';
+import { useEffect } from 'react';
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -14,17 +13,30 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
 
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
+    localStorage.removeItem('adminUser');
+    localStorage.removeItem('uums_app_id');
+    localStorage.removeItem('uums_app_secret');
     navigate('/admin/login');
   };
 
-  // 检查管理员权限
   const adminToken = localStorage.getItem('adminToken');
-  if (adminToken !== ADMIN_PASSWORD && location.pathname !== '/admin/login') {
-    navigate('/admin/login');
+  const adminUser = localStorage.getItem('adminUser');
+  
+  // 验证token和用户信息
+  const isAuthenticated = adminToken && adminUser;
+  
+  // 使用useEffect进行导航，避免在渲染中更新状态
+  useEffect(() => {
+    if (!isAuthenticated && location.pathname !== '/admin/login') {
+      navigate('/admin/login');
+    }
+  }, [isAuthenticated, location.pathname, navigate]);
+  
+  // 如果未认证且不在登录页，不渲染内容
+  if (!isAuthenticated && location.pathname !== '/admin/login') {
     return null;
   }
 
-  // 如果是登录页面，不显示布局
   if (location.pathname === '/admin/login') {
     return <>{children}</>;
   }
@@ -32,12 +44,12 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
   const navItems = [
     { path: '/admin', label: '统计概览', icon: '📊' },
     { path: '/admin/users', label: '用户管理', icon: '👥' },
+    { path: '/admin/knowledge-graph', label: '知识图谱', icon: '🗺️' },
     { path: '/admin/settings', label: '考试设置', icon: '⚙️' },
   ];
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* 侧边栏 */}
       <div className="flex">
         <aside className="w-64 bg-white dark:bg-gray-800 min-h-screen shadow-lg border-r border-gray-200 dark:border-gray-700 fixed">
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
@@ -83,7 +95,6 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
           </div>
         </aside>
 
-        {/* 主内容区 */}
         <main className="ml-64 flex-1 p-8">
           <div className="max-w-6xl">
             <div className="flex items-center justify-between mb-8">

@@ -1,11 +1,13 @@
 # 字符串处理
 
-<div class="intro-card">
-  <h3>📖 章节导学</h3>
-  <p>字符串是 Python 中最常用的数据类型之一。本章学习字符串的常用操作和方法。</p>
+<div className="intro-card">
+  <h3>🎯 学习目标</h3>
+  <p>本章核心目标：掌握字符串的基本操作、常用方法和格式化技巧。</p>
 </div>
 
-## 字符串基本操作
+---
+
+## 一、字符串基本操作
 
 ```python
 # 字符串连接
@@ -25,7 +27,9 @@ print(s[0])   # 'P'
 print(s[-1])  # 'n'
 ```
 
-## 字符串切片
+---
+
+## 二、字符串切片
 
 ```python
 s = "Hello, World!"
@@ -38,7 +42,9 @@ print(s[::2])       # "Hlo ol!"（步长为2）
 print(s[::-1])      # "!dlroW ,olleH"（反转）
 ```
 
-## 字符串方法
+---
+
+## 三、常用字符串方法
 
 ```python
 s = "  Hello, World!  "
@@ -46,14 +52,11 @@ s = "  Hello, World!  "
 # 大小写转换
 s.upper()          # "  HELLO, WORLD!  "
 s.lower()          # "  hello, world!  "
-s.capitalize()     # "  hello, world!  "（首字母大写）
 s.title()          # "  Hello, World!  "（每个词首字母大写）
-s.swapcase()       # "  hELLO, wORLD!  "
 
 # 去除空白
 s.strip()          # "Hello, World!"（去除两端）
 s.lstrip()          # "Hello, World!  "（去除左端）
-s.rstrip()          # "  Hello, World!"（去除右端）
 
 # 查找和替换
 s.find("World")     # 9（找不到返回 -1）
@@ -67,7 +70,9 @@ words = ["Hello", "World"]
 "-".join(words)     # "Hello-World"
 ```
 
-## 字符串格式化
+---
+
+## 四、字符串格式化
 
 ```python
 name = "Alice"
@@ -78,37 +83,37 @@ print(f"My name is {name}, I'm {age} years old.")
 
 # format() 方法
 print("My name is {}, I'm {} years old.".format(name, age))
-print("My name is {0}, I'm {1} years old. {0} is my name.".format(name, age))
 
-# % 运算符（旧式）
-print("My name is %s, I'm %d years old." % (name, age))
-```
-
-## 字符串判断
-
-```python
-s = "Hello123"
-
-s.isdigit()      # False（是否全是数字）
-s.isalpha()      # False（是否全是字母）
-s.isalnum()      # True（是否全是字母或数字）
-s.isupper()      # False（是否全是大写）
-s.islower()      # False（是否全是小写）
-s.isspace()      # False（是否全是空白）
-s.startswith("Hello")  # True
-s.endswith("123")      # True
+# 格式化数字
+print(f"Pi is approximately {3.14159:.2f}")  # 保留2位小数
 ```
 
 ---
 
-## 📝 随堂练习
+## ✅ 本章核心技能清单
 
-👉 前往 [练习页面](/practice/ch07_strings) 完成以下任务：
-
-1. **字符串切片** - 提取字符串中的子串
-2. **词频统计** - 统计一段文字中每个词出现的次数
-3. **格式转换** - 将用户输入的名字格式化为"姓.名"的形式
+| 技能点 | 掌握程度 | 练习建议 |
+|--------|----------|---------|
+| 字符串索引 | ★★★ | 基本操作 |
+| 字符串切片 | ★★★ | 常用技巧 |
+| 大小写转换 | ★★☆ | upper/lower/title |
+| 空白处理 | ★★★ | strip/lstrip/rstrip |
+| 查找替换 | ★★☆ | find/replace/count |
+| 分割连接 | ★★★ | split/join |
+| f-string格式化 | ★★★ | 必须熟练 |
 
 ---
 
-**[下一章预告]** → 文件操作：读写文件和 JSON 数据处理
+<div className="practice-box">
+## 📝 技能自测
+
+1. 如何获取字符串的最后一个字符？
+2. `s[::-1]` 的作用是什么？
+3. f-string 和 format() 哪个更推荐使用？
+
+👉 [开始练习](/practice/ch07_strings)
+</div>
+
+---
+
+**[下一章]** → 文件操作

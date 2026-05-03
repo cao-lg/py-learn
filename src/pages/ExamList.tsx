@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { checkExamAvailability, formatDateTime, type ExamStatus } from '../utils/exam-schedule';
+import { uumsClient, getStoredUserId, getStoredUsername } from '../utils/uums-api';
 
 interface ExamInfo {
   id: string;
@@ -22,68 +23,27 @@ export function ExamListPage() {
   const [exams, setExams] = useState<ExamInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [examStatus, setExamStatus] = useState<Record<string, ExamStatus>>({});
-  const [userId, setUserId] = useState('');
   const [isPasswordRequired, setIsPasswordRequired] = useState(false);
   const [inputPassword, setInputPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
 
-  const verifyPassword = async (userId: string, password: string) => {
-    try {
-      // 开发环境使用模拟数据
-      if (import.meta.env.DEV) {
-        console.log('Development mode: using mock data for password verification');
-        // 模拟验证成功
-        return true;
-      }
-
-      // 生产环境使用真实 API
-      const response = await fetch('/api/users/verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, password })
-      });
-      
-      if (!response.ok) {
-        // 检查是否是用户不存在的错误
-        if (response.status === 404) {
-          // 用户不存在，清理本地数据
-          localStorage.removeItem('userId');
-          localStorage.removeItem('userName');
-          navigate('/');
-          return false;
-        }
-        // 其他错误，如密码错误，不清理用户数据
-        return false;
-      }
-      
-      const data = await response.json();
-      return data.ok;
-    } catch (error) {
-      console.error('Password verification error:', error);
-      // 网络错误，不清理用户数据
-      return false;
+  const verifyPassword = async (username: string, password: string): Promise<boolean> => {
+    const result = await uumsClient.verifyUser(username, password);
+    if (result && result.code === 200 && result.data.valid) {
+      return true;
     }
+    return false;
   };
 
   const checkAuth = async () => {
-    const storedUserId = localStorage.getItem('userId');
-    setUserId(storedUserId || '');
-    
+    const storedUserId = getStoredUserId();
+
     if (storedUserId) {
-      // 开发环境自动通过认证，方便测试
-      if (import.meta.env.DEV) {
-        console.log('Development mode: skipping password verification');
-        setIsAuthenticated(true);
-        return;
-      }
-      
-      // 检查是否已经在HomePage中验证过密码
-      // 通过URL参数来判断
       const urlParams = new URLSearchParams(window.location.search);
       const authenticated = urlParams.get('authenticated');
-      
+
       if (authenticated === 'true') {
         setIsAuthenticated(true);
       } else {
@@ -95,8 +55,9 @@ export function ExamListPage() {
   };
 
   const handlePasswordVerify = async () => {
-    if (userId && inputPassword) {
-      const isVerified = await verifyPassword(userId, inputPassword);
+    const storedUsername = getStoredUsername();
+    if (storedUsername && inputPassword) {
+      const isVerified = await verifyPassword(storedUsername, inputPassword);
       if (isVerified) {
         setIsPasswordRequired(false);
         setIsAuthenticated(true);
@@ -123,8 +84,7 @@ export function ExamListPage() {
             throw new Error('Failed to load exam index');
           }
           const data: ExamIndex = await examRes.json();
-          
-          // 直接使用数据，不依赖exam-schedule API
+
           setExams(data.exams);
           const status: Record<string, ExamStatus> = {};
           data.exams.forEach(exam => {
@@ -134,7 +94,6 @@ export function ExamListPage() {
         })
         .catch(error => {
           console.error('Error loading exams:', error);
-          // 即使出错，也设置一个空数组，避免页面一直显示加载中
           setExams([]);
           setExamStatus({});
         })
@@ -287,8 +246,8 @@ export function ExamListPage() {
               key={exam.id}
               onClick={() => handleExamClick(exam)}
               className={`block bg-white dark:bg-gray-800 rounded-xl border p-6 hover:shadow-lg transition-all duration-200 group cursor-pointer ${
-                isAvailable 
-                  ? 'border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-600' 
+                isAvailable
+                  ? 'border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-600'
                   : 'border-gray-200 dark:border-gray-700 opacity-60'
               }`}
             >
@@ -325,8 +284,8 @@ export function ExamListPage() {
                 </div>
                 <div className="ml-4">
                   <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${
-                    isAvailable 
-                      ? 'bg-purple-100 dark:bg-purple-900/30 group-hover:bg-purple-200 dark:group-hover:bg-purple-800/50' 
+                    isAvailable
+                      ? 'bg-purple-100 dark:bg-purple-900/30 group-hover:bg-purple-200 dark:group-hover:bg-purple-800/50'
                       : 'bg-gray-100 dark:bg-gray-700'
                   }`}>
                     <span className="text-2xl">📝</span>

@@ -1,94 +1,48 @@
 {
-  "id": "ch10_oop",
-  "title": "第十章测验：面向对象编程",
-  "description": "测试类和对象的创建与使用",
-  "duration": 30,
-  "totalScore": 100,
-  "passingScore": 60,
+  "title": "第十章面向对象",
+  "description": "掌握面向对象的基本概念和类的使用",
   "questions": [
     {
-      "id": "ex10_q1",
-      "type": "output",
-      "title": "创建简单类",
-      "instruction": "定义类 Person，有 name 属性，实例化后打印 name。\n\n期望输出：Alice",
-      "initialCode": "class Person:\n    def __init__(self, name):\n        self.name = name\n\np = Person('Alice')\nprint(p.name)\n",
-      "testConfig": {
-        "expected": "Alice",
-        "timeout_ms": 5000
-      },
-      "hints": [
-        { "text": "__init__ 构造函数设置属性", "visible": false }
-      ]
+      "id": 1,
+      "type": "code",
+      "question": "定义一个类 Person，有 name 和 age 属性，还有一个 greet() 方法打印 'Hello, my name is {name}'。创建对象并调用 greet()。",
+      "initialCode": "class Person:\n    def __init__(self, name, age):\n        self.name = name\n        self.age = age\n    \n    def greet(self):\n        # 在这里添加代码\n        pass\n\np = Person('Alice', 25)\np.greet()",
+      "expected": "Hello, my name is Alice"
     },
     {
-      "id": "ex10_q2",
-      "type": "output",
-      "title": "实例方法",
-      "instruction": "定义类 Dog，有 bark() 方法打印 'Woof!'，调用该方法。\n\n期望输出：Woof!",
-      "initialCode": "class Dog:\n    def bark(self):\n        print('Woof!')\n\nd = Dog()\nd.bark()\n",
-      "testConfig": {
-        "expected": "Woof!",
-        "timeout_ms": 5000
-      },
-      "hints": [
-        { "text": "self 参数引用实例本身", "visible": false }
-      ]
+      "id": 2,
+      "type": "code",
+      "question": "定义一个类 Circle，有 radius 属性和 area() 方法计算面积。创建对象并打印面积。",
+      "initialCode": "import math\n\nclass Circle:\n    def __init__(self, radius):\n        self.radius = radius\n    \n    def area(self):\n        # 在这里添加代码\n        pass\n\nc = Circle(5)\nprint(c.area())",
+      "expected": "78.53981633974483"
     },
     {
-      "id": "ex10_q3",
-      "type": "output",
-      "title": "__str__方法",
-      "instruction": "定义类 Book，有 title 属性，实现 __str__ 返回书名，print 打印。\n\n期望输出：Python Basics",
-      "initialCode": "class Book:\n    def __init__(self, title):\n        self.title = title\n    \n    def __str__(self):\n        return self.title\n\nb = Book('Python Basics')\nprint(b)\n",
-      "testConfig": {
-        "expected": "Python Basics",
-        "timeout_ms": 5000
-      },
-      "hints": [
-        { "text": "__str__ 定义 print 时的字符串表示", "visible": false }
-      ]
+      "id": 3,
+      "type": "code",
+      "question": "定义一个类 Rectangle，有 width 和 height 属性，还有 perimeter() 方法计算周长。创建对象并打印周长。",
+      "initialCode": "class Rectangle:\n    def __init__(self, width, height):\n        self.width = width\n        self.height = height\n    \n    def perimeter(self):\n        # 在这里添加代码\n        pass\n\nr = Rectangle(3, 4)\nprint(r.perimeter())",
+      "expected": "14"
     },
     {
-      "id": "ex10_q4",
-      "type": "output",
-      "title": "继承",
-      "instruction": "父类 Animal 有 name 属性，子类 Cat 继承它，创建 Cat 实例打印 name。\n\n期望输出：Tom",
-      "initialCode": "class Animal:\n    def __init__(self, name):\n        self.name = name\n\nclass Cat(Animal):\n    def __init__(self, name, color):\n        super().__init__(name)\n        self.color = color\n\nc = Cat('Tom', 'Orange')\nprint(c.name)\n",
-      "testConfig": {
-        "expected": "Tom",
-        "timeout_ms": 5000
-      },
-      "hints": [
-        { "text": "super().__init__() 调用父类构造函数", "visible": false }
-      ]
+      "id": 4,
+      "type": "code",
+      "question": "定义一个类 Student，继承自 Person 类，并添加 grade 属性。重写 greet() 方法打印 'Hello, my name is {name} and I am in grade {grade}'。",
+      "initialCode": "class Person:\n    def __init__(self, name):\n        self.name = name\n\nclass Student(Person):\n    def __init__(self, name, grade):\n        super().__init__(name)\n        self.grade = grade\n    \n    def greet(self):\n        # 在这里添加代码\n        pass\n\ns = Student('Bob', 10)\ns.greet()",
+      "expected": "Hello, my name is Bob and I am in grade 10"
     },
     {
-      "id": "ex10_q5",
-      "type": "output",
-      "title": "类属性",
-      "instruction": "类 Counter 有类属性 count=0，每创建一个实例 count 加 1，创建两个实例后打印 count。\n\n期望输出：2",
-      "initialCode": "class Counter:\n    count = 0\n    def __init__(self):\n        Counter.count += 1\n\nc1 = Counter()\nc2 = Counter()\nprint(Counter.count)\n",
-      "testConfig": {
-        "expected": "2",
-        "timeout_ms": 5000
-      },
-      "hints": [
-        { "text": "类属性被所有实例共享", "visible": false }
-      ]
+      "id": 5,
+      "type": "code",
+      "question": "定义一个类 BankAccount，有 balance 属性，有 deposit() 和 withdraw() 方法。创建对象，存入100，取出50，打印余额。",
+      "initialCode": "class BankAccount:\n    def __init__(self, balance):\n        self.balance = balance\n    \n    def deposit(self, amount):\n        # 在这里添加代码\n        pass\n    \n    def withdraw(self, amount):\n        # 在这里添加代码\n        pass\n\naccount = BankAccount(100)\naccount.withdraw(50)\nprint(account.balance)",
+      "expected": "50"
     },
     {
-      "id": "ex10_q6",
-      "type": "output",
-      "title": "__add__方法",
-      "instruction": "定义类 Vector，实现 __add__ 使两个向量相加，返回新的 Vector。\n\n期望输出：(4, 6)",
-      "initialCode": "class Vector:\n    def __init__(self, x, y):\n        self.x = x\n        self.y = y\n    \n    def __add__(self, other):\n        return Vector(self.x + other.x, self.y + other.y)\n    \n    def __str__(self):\n        return f'({self.x}, {self.y})'\n\nv1 = Vector(1, 2)\nv2 = Vector(3, 4)\nprint(v1 + v2)\n",
-      "testConfig": {
-        "expected": "(4, 6)",
-        "timeout_ms": 5000
-      },
-      "hints": [
-        { "text": "__add__ 定义 + 运算符行为", "visible": false }
-      ]
+      "id": 6,
+      "type": "code",
+      "question": "定义一个类 Vector，有 x 和 y 属性，重写 __add__ 方法实现向量加法。创建两个向量并相加，打印结果。",
+      "initialCode": "class Vector:\n    def __init__(self, x, y):\n        self.x = x\n        self.y = y\n    \n    def __add__(self, other):\n        # 在这里添加代码\n        pass\n    \n    def __str__(self):\n        return f'({self.x}, {self.y})'\n\nv1 = Vector(2, 3)\nv2 = Vector(4, 5)\nprint(v1 + v2)",
+      "expected": "(6, 8)"
     }
   ]
 }

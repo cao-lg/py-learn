@@ -1,11 +1,13 @@
 # 函数
 
-<div class="intro-card">
-  <h3>📖 章节导学</h3>
-  <p>函数是组织代码的基本单元，可以提高代码的复用性和可读性。</p>
+<div className="intro-card">
+  <h3>🎯 学习目标</h3>
+  <p>本章核心目标：掌握函数定义、参数传递、返回值和高阶函数的使用。</p>
 </div>
 
-## 定义和调用函数
+---
+
+## 一、定义和调用函数
 
 ```python
 # 定义函数
@@ -22,7 +24,9 @@ def greet(name):
 greet("Alice")  # 输出: Hello, Alice!
 ```
 
-## 返回值
+---
+
+## 二、返回值
 
 ```python
 def add(a, b):
@@ -30,9 +34,21 @@ def add(a, b):
 
 result = add(3, 5)
 print(result)  # 8
+
+# 可以返回多个值
+def get_size():
+    width = 10
+    height = 20
+    return width, height
+
+w, h = get_size()  # 拆包
 ```
 
-## 默认参数
+---
+
+## 三、参数类型
+
+### 默认参数
 
 ```python
 def greet(name="World"):
@@ -42,10 +58,9 @@ greet()         # Hello, World!
 greet("Alice")  # Hello, Alice!
 ```
 
-## 可变参数 *args 和 **kwargs
+### 可变参数 *args
 
 ```python
-# *args - 接收任意数量的位置参数
 def sum_all(*numbers):
     total = 0
     for n in numbers:
@@ -54,8 +69,11 @@ def sum_all(*numbers):
 
 print(sum_all(1, 2, 3))      # 6
 print(sum_all(1, 2, 3, 4, 5)) # 15
+```
 
-# **kwargs - 接收任意数量的关键字参数
+### 关键字参数 **kwargs
+
+```python
 def print_info(**info):
     for key, value in info.items():
         print(f"{key}: {value}")
@@ -63,33 +81,62 @@ def print_info(**info):
 print_info(name="Alice", age=20, city="Beijing")
 ```
 
-## Lambda 表达式
+---
+
+## 四、Lambda 表达式
 
 ```python
-# 普通函数
+# 普通函数 vs Lambda
 def square(x):
     return x ** 2
 
-# Lambda 表达式
 square = lambda x: x ** 2
 print(square(5))  # 25
 
 # 与 map、filter 结合
 numbers = [1, 2, 3, 4, 5]
-squares = list(map(lambda x: x ** 2, numbers))
-evens = list(filter(lambda x: x % 2 == 0, numbers))
+squares = list(map(lambda x: x ** 2, numbers))  # [1, 4, 9, 16, 25]
+evens = list(filter(lambda x: x % 2 == 0, numbers))  # [2, 4]
 ```
 
 ---
 
-## 📝 随堂练习
+## 五、递归函数
 
-👉 前往 [练习页面](/practice/ch05_functions) 完成以下任务：
+```python
+def factorial(n):
+    if n <= 1:  # 基线条件
+        return 1
+    return n * factorial(n - 1)  # 递归调用
 
-1. **定义函数** - 创建一个计算阶乘的函数
-2. **递归函数** - 用递归实现斐波那契数列
-3. **Lambda 应用** - 使用 lambda 和 map 处理数据
+print(factorial(5))  # 120
+```
 
 ---
 
-**[下一章预告]** → 数据结构：列表、元组、字典、集合
+## ✅ 本章核心技能清单
+
+| 技能点 | 掌握程度 | 练习建议 |
+|--------|----------|---------|
+| 函数定义与调用 | ★★★ | 必须熟练 |
+| 参数与返回值 | ★★★ | 理解参数传递 |
+| 默认参数 | ★★★ | 常用技巧 |
+| *args 和 **kwargs | ★★☆ | 处理可变参数 |
+| Lambda 表达式 | ★★☆ | 配合 map/filter 使用 |
+| 递归函数 | ★★☆ | 理解基线条件 |
+
+---
+
+<div className="practice-box">
+## 📝 技能自测
+
+1. 如何定义一个带参数的函数？
+2. return 和 print 有什么区别？
+3. Lambda 表达式适用于什么场景？
+
+👉 [开始练习](/practice/ch05_functions)
+</div>
+
+---
+
+**[下一章]** → 数据结构

@@ -1,40 +1,46 @@
 {
   "id": "ch08_file_io",
-  "title": "Python 基础 - 第八章：文件操作",
-  "description": "学习文件读写和 JSON 数据处理",
+  "title": "第八章：文件操作",
+  "description": "掌握文件读写和 JSON 数据处理",
+  "skillPoints": ["文件读取", "文件写入", "JSON序列化", "JSON反序列化", "上下文管理器"],
   "questions": [
     {
-      "id": "fio01_open_file",
+      "id": "fio01_read_content",
       "type": "output",
-      "title": "打开文件",
-      "instruction": "使用 with 语句打开文件 'test.txt'（内容预设为 'Hello'），读取并打印内容。\n\n提示：可以用 StringIO 模拟文件操作。",
-      "initialCode": "from io import StringIO\n\n# 模拟文件内容\nfile_content = 'Hello'\n\n# 创建一个模拟文件对象来模拟读取\nf = StringIO(file_content)\ncontent = f.read()\nprint(content)\n",
+      "title": "读取内容",
+      "skill": "文件读取",
+      "instruction": "使用 StringIO 模拟读取文件内容 'Hello'，读取并打印内容。",
+      "initialCode": "from io import StringIO\n\nfile_content = 'Hello'\nf = StringIO(file_content)\n# 在下方编写代码\n",
       "testConfig": {
         "expected": "Hello",
         "timeout_ms": 5000
       },
       "hints": [
-        { "text": "使用 StringIO 可以模拟文件操作", "visible": false }
-      ]
+        { "text": "f.read()", "visible": true }
+      ],
+      "difficulty": 1
     },
     {
-      "id": "fio02_write",
+      "id": "fio02_write_content",
       "type": "output",
-      "title": "写入模拟",
+      "title": "写入内容",
+      "skill": "文件写入",
       "instruction": "使用 StringIO 模拟写入操作，写入 'World' 并获取结果。",
-      "initialCode": "from io import StringIO\n\nf = StringIO()\nf.write('World')\nresult = f.getvalue()\nprint(result)\n",
+      "initialCode": "from io import StringIO\n\nf = StringIO()\nf.write('World')\n# 在下方编写代码\n",
       "testConfig": {
         "expected": "World",
         "timeout_ms": 5000
       },
       "hints": [
-        { "text": "write() 写入，getvalue() 获取内容", "visible": false }
-      ]
+        { "text": "f.getvalue()", "visible": true }
+      ],
+      "difficulty": 1
     },
     {
       "id": "fio03_json_dumps",
       "type": "output",
       "title": "Python转JSON",
+      "skill": "JSON序列化",
       "instruction": "将字典 `{'name': 'Alice', 'age': 20}` 转为 JSON 字符串并打印。",
       "initialCode": "import json\n\ndata = {'name': 'Alice', 'age': 20}\n# 在下方编写代码\n",
       "testConfig": {
@@ -42,13 +48,15 @@
         "timeout_ms": 5000
       },
       "hints": [
-        { "text": "json.dumps(data)", "visible": false }
-      ]
+        { "text": "json.dumps(data)", "visible": true }
+      ],
+      "difficulty": 1
     },
     {
       "id": "fio04_json_loads",
       "type": "output",
       "title": "JSON转Python",
+      "skill": "JSON反序列化",
       "instruction": "将 JSON 字符串 `'{\"a\": 1, \"b\": 2}'` 转为 Python 字典，获取 'a' 的值。",
       "initialCode": "import json\n\ns = '{\"a\": 1, \"b\": 2}'\n# 在下方编写代码\n",
       "testConfig": {
@@ -56,13 +64,15 @@
         "timeout_ms": 5000
       },
       "hints": [
-        { "text": "json.loads(s)['a']", "visible": false }
-      ]
+        { "text": "json.loads(s)['a']", "visible": true }
+      ],
+      "difficulty": 1
     },
     {
       "id": "fio05_json_indent",
       "type": "output",
       "title": "JSON格式化",
+      "skill": "JSON序列化",
       "instruction": "将字典 `{'name': 'Bob', 'score': 95}` 转为带缩进的 JSON 字符串（indent=2）。",
       "initialCode": "import json\n\ndata = {'name': 'Bob', 'score': 95}\n# 在下方编写代码\n",
       "testConfig": {
@@ -70,41 +80,31 @@
         "timeout_ms": 5000
       },
       "hints": [
-        { "text": "json.dumps(data, indent=2)", "visible": false }
-      ]
+        { "text": "json.dumps(data, indent=2)", "visible": true }
+      ],
+      "difficulty": 2
     },
     {
       "id": "fio06_readlines",
       "type": "output",
       "title": "逐行读取",
+      "skill": "文件读取",
       "instruction": "使用 StringIO 模拟读取多行内容 'line1\\nline2\\nline3'，用 readlines() 获取所有行并打印第一行。",
-      "initialCode": "from io import StringIO\n\ncontent = 'line1\\nline2\\nline3'\nf = StringIO(content)\nlines = f.readlines()\nprint(lines[0].strip())\n",
+      "initialCode": "from io import StringIO\n\ncontent = 'line1\\nline2\\nline3'\nf = StringIO(content)\n# 在下方编写代码\n",
       "testConfig": {
         "expected": "line1",
         "timeout_ms": 5000
       },
       "hints": [
-        { "text": "readlines() 返回列表", "visible": false }
-      ]
+        { "text": "lines = f.readlines(); print(lines[0].strip())", "visible": true }
+      ],
+      "difficulty": 2
     },
     {
-      "id": "fio07_stringio",
-      "type": "output",
-      "title": "StringIO基本操作",
-      "instruction": "创建一个 StringIO 对象，写入 'test'，然后seek到开头读取。",
-      "initialCode": "from io import StringIO\n\nf = StringIO()\nf.write('test')\nf.seek(0)\nprint(f.read())\n",
-      "testConfig": {
-        "expected": "test",
-        "timeout_ms": 5000
-      },
-      "hints": [
-        { "text": "seek(0) 回到开头", "visible": false }
-      ]
-    },
-    {
-      "id": "fio08_json_list",
+      "id": "fio07_json_list",
       "type": "output",
       "title": "JSON数组",
+      "skill": "JSON序列化",
       "instruction": "将列表 `[1, 2, 3, 4, 5]` 转为 JSON 字符串。",
       "initialCode": "import json\n\ndata = [1, 2, 3, 4, 5]\n# 在下方编写代码\n",
       "testConfig": {
@@ -112,13 +112,15 @@
         "timeout_ms": 5000
       },
       "hints": [
-        { "text": "json.dumps(data)", "visible": false }
-      ]
+        { "text": "json.dumps(data)", "visible": true }
+      ],
+      "difficulty": 1
     },
     {
-      "id": "fio09_nested_json",
+      "id": "fio08_nested_json",
       "type": "output",
       "title": "嵌套JSON",
+      "skill": "JSON反序列化",
       "instruction": "将嵌套字典 `{'person': {'name': 'Alice'}}` 转为 JSON，获取 'Alice'。",
       "initialCode": "import json\n\ndata = {'person': {'name': 'Alice'}}\n# 在下方编写代码\n",
       "testConfig": {
@@ -126,50 +128,41 @@
         "timeout_ms": 5000
       },
       "hints": [
-        { "text": "先 dumps 再 loads，然后访问 ['person']['name']", "visible": false }
-      ]
+        { "text": "data['person']['name']", "visible": true }
+      ],
+      "difficulty": 2
     },
     {
-      "id": "fio10_bytes_io",
-      "type": "output",
-      "title": "BytesIO",
-      "instruction": "使用 BytesIO 写入 b'hello' 并读取。",
-      "initialCode": "from io import BytesIO\n\nf = BytesIO()\nf.write(b'hello')\nf.seek(0)\nprint(f.read())\n",
-      "testConfig": {
-        "expected": "b'hello'",
-        "timeout_ms": 5000
-      },
-      "hints": [
-        { "text": "BytesIO 用于二进制数据", "visible": false }
-      ]
-    },
-    {
-      "id": "fio11_writelines",
-      "type": "output",
-      "title": "批量写入",
-      "instruction": "使用 StringIO 模拟 writelines()，写入 ['line1\\n', 'line2\\n']。",
-      "initialCode": "from io import StringIO\n\nf = StringIO()\nf.writelines(['line1\\n', 'line2\\n'])\nf.seek(0)\nprint(f.read())\n",
-      "testConfig": {
-        "expected": "line1\\nline2\\n",
-        "timeout_ms": 5000
-      },
-      "hints": [
-        { "text": "writelines() 接收字符串列表", "visible": false }
-      ]
-    },
-    {
-      "id": "fio12_json_ensure_ascii",
+      "id": "fio09_json_chinese",
       "type": "output",
       "title": "JSON中文处理",
+      "skill": "JSON序列化",
       "instruction": "将 `{'name': '张三'}` 转为 JSON（ensure_ascii=False），直接打印中文字符。",
-      "initialCode": "import json\n\ndata = {'name': '张三'}\nresult = json.dumps(data, ensure_ascii=False)\nprint(result)\n",
+      "initialCode": "import json\n\ndata = {'name': '张三'}\n# 在下方编写代码\n",
       "testConfig": {
         "expected": "{\"name\": \"张三\"}",
         "timeout_ms": 5000
       },
       "hints": [
-        { "text": "ensure_ascii=False 保留中文", "visible": false }
-      ]
+        { "text": "json.dumps(data, ensure_ascii=False)", "visible": true }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "fio10_seek_read",
+      "type": "output",
+      "title": "seek操作",
+      "skill": "文件读取",
+      "instruction": "创建一个 StringIO 对象，写入 'test'，然后seek到开头读取。",
+      "initialCode": "from io import StringIO\n\nf = StringIO()\nf.write('test')\n# 在下方编写代码\n",
+      "testConfig": {
+        "expected": "test",
+        "timeout_ms": 5000
+      },
+      "hints": [
+        { "text": "f.seek(0); f.read()", "visible": true }
+      ],
+      "difficulty": 2
     }
   ]
 }
