@@ -1,5 +1,5 @@
-export const API_BASE = 'https://photographs-classes-spirit-cleveland.trycloudflare.com/api';
-export const SITE_DB_NAME = 'site_1777469231464';
+export const API_BASE = import.meta.env.VITE_API_BASE || 'https://photographs-classes-spirit-cleveland.trycloudflare.com/api';
+export const SITE_DB_NAME = import.meta.env.VITE_SITE_DB_NAME || 'site_1777469231464';
 
 export interface UUMSUser {
   id: number;
